@@ -3,4 +3,4 @@ browser/server/certs/*
 .temp/
 bin/firefox/
 browser/extension.xpi
-browser/test.ipynb
+test.ipynb
