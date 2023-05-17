@@ -4,3 +4,6 @@ browser/server/certs/*
 bin/firefox/
 browser/extension.xpi
 test.ipynb
+browser/server/__pycache__/
+gpt_tools/__pycache__/
+openssl.config

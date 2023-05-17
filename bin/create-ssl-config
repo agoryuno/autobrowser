@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Read openssl values from config.ini
+config_file="config.ini"
+openssl_c=$(awk -F "=" '/OPENSSL_C/ {print $2}' $config_file | tr -d ' ')
+openssl_st=$(awk -F "=" '/OPENSSL_ST/ {print $2}' $config_file | tr -d ' ')
+openssl_l=$(awk -F "=" '/OPENSSL_L/ {print $2}' $config_file | tr -d ' ')
+openssl_o=$(awk -F "=" '/OPENSSL_O/ {print $2}' $config_file | tr -d ' ')
+openssl_ou=$(awk -F "=" '/OPENSSL_OU/ {print $2}' $config_file | tr -d ' ')
+
+# Create openssl.config
+cat > openssl.config << EOF
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+# These values filled from config.ini
+#
+C = ${openssl_c}
+ST = ${openssl_st}
+L = ${openssl_l}
+O = ${openssl_o}
+OU = ${openssl_ou}
+CN = 127.0.0.1
+
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+
+[alt_names]
+DNS.1 = 127.0.0.1
+EOF
