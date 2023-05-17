@@ -6,6 +6,7 @@
 base_dir=$(dirname $(dirname $(realpath "$0")))
 #script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
+echo "base_dir: $base_dir"
 
 config_file="config.ini"
 while getopts "cf:" opt; do
@@ -22,7 +23,7 @@ while getopts "cf:" opt; do
 done
 
 # Change the working directory to the script's directory
-cd "$base_dir"
+#cd "$base_dir"
 
 # Read SERVER_HOST, SERVER_PORT, and TOKEN_FILE from the config.ini file
 config_file="$base_dir/$config_file"
@@ -34,7 +35,8 @@ token_file="$base_dir/$token_file"
 
 # Check if the token file exists, if not, create it using the 'make-token' script
 if [ ! -f "$token_file" ]; then
-  ./make-token "$config_file"
+  echo "Token file not found. Creating a new one.."
+  $base_dir/bin/make-token "$config_file"
 fi
 
 flask_token=$(cat $token_file)

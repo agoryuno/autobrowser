@@ -7,3 +7,4 @@ test.ipynb
 browser/server/__pycache__/
 gpt_tools/__pycache__/
 openssl.config
+token.txt
