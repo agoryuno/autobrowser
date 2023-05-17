@@ -1,0 +1,95 @@
+#!/bin/bash
+
+# script: install-firefox
+
+# This installs the latest development version of Firefox
+# The development version is needed to install the unsigned
+# extension
+# Before the extension can be installed you need to set the
+# `xpinstall.signatures.required` in `about:config` to `false`
+# Then install the extension in `about:addons`
+
+cache=false
+config_file="config.ini"
+while getopts "cf:" opt; do
+  case ${opt} in
+    c )
+      cache=true
+      ;;
+    f )
+      config_file=$OPTARG
+      ;;
+    \? )
+      echo "Usage: $0 [-c (to cache)] [-f config_file (relative to "\
+           "the project's root directory)]"
+      exit 1
+      ;;
+  esac
+done
+
+# Convert config_file to an absolute path, relative to the script's directory
+base_dir=$(dirname $(dirname $(realpath "$0")))
+config_file=$(realpath "$base_dir/$config_file")
+
+
+# Read the application mode from config.ini
+mode=$(grep "^MODE=" "$config_file" | awk -F "=" '{print $2}')
+
+# Read the path corresponding to the current mode
+if [ "$mode" = "DEV" ]; then
+    root_path=$(awk -F '=' '/^\[DEV\]/{f=1;next} /^\[/ {f=0} f && /^PATH/ {print $2}' config.ini)
+elif [ "$mode" = "DEPLOY" ]; then
+    root_path=$(awk -F '=' '/^\[DEPLOY\]/{f=1;next} /^\[/ {f=0} f && /^PATH/ {print $2}' config.ini)
+else
+    echo "Invalid mode in config.ini"
+    exit 1
+fi
+
+# Interpolate the $HOME variable in the root_path
+root_path=$(echo "${root_path}" | envsubst)
+
+# Read the download URL from config.ini
+download_url=$(sed -n 's/^URL=\(.*\)$/\1/p' config.ini)
+
+# Create a .temp directory in the root path
+mkdir --parents "${root_path}/.temp"
+
+if [ "$cache" = true ] && [ -f "${root_path}/.temp/firefox.tar.bz2" ]; then
+  echo "Using cached Firefox download"
+else
+  echo "Downloading Firefox from ${download_url}.."
+  curl -L -o "${root_path}/.temp/firefox.tar.bz2" "${download_url}"
+fi
+
+# Untar the file in the .temp directory
+echo "Expanding the Firefox installation archive.."
+tar -xjf "${root_path}/.temp/firefox.tar.bz2" -C "${root_path}/.temp"
+
+# Remove all contents from the "${root_path}/bin/firefox" directory
+echo "Removing the existing installation.."
+rm -rf "${root_path}/bin/firefox"
+
+# Create the bin/firefox directory
+mkdir --parents "${root_path}/bin/firefox"
+
+# Copy the contents of the untarred directory into the bin/firefox directory
+echo "Copying files.."
+cp -r "${root_path}/.temp/firefox/"* "${root_path}/bin/firefox"
+
+# Delete the .temp directory and all of its contents, except the downloaded file, if cache flag is not set
+if [ "$cache" = false ]; then
+  find "${root_path}/.temp" -type f -not -name 'firefox.tar.bz2' -delete
+  find "${root_path}/.temp" -type d -empty -delete
+fi
+
+
+# Create the profile to use for the browser
+./bin/make-firefox-profile
+
+# Override application.ini
+echo "[XRE] EnableProfileMigrator=0" > "${root_path}/bin/firefox/override.ini"
+
+# Install the Firefox extension
+${root_path}/bin/install-extension ${root_path}
+
+

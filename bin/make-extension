@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# script: make-extension
+
+# Function to increase minor version number
+increase_minor_version() {
+    version=$1
+    IFS="."
+    read -ra version_parts <<< "$version"
+    minor=$((version_parts[2] + 1))
+    new_version="${version_parts[0]}.${version_parts[1]}.$minor"
+    echo "$new_version"
+}
+
+# Read command line arguments
+while [[ $# -gt 0 ]]; do
+    key="$1"
+
+    case $key in
+        -v|--version)
+        UPDATE_VERSION="true"
+        shift
+        ;;
+        *)
+        POSITIONAL+=("$1")
+        shift
+        ;;
+    esac
+done
+
+# Read the MODE value from config.ini
+mode=$(grep -A1 "\[MAIN\]" config.ini | grep "MODE" | cut -d'=' -f2)
+
+# Check if a directory argument was provided, otherwise use the default "browser/extension"
+dir="${POSITIONAL[0]:-browser/extension}"
+
+# Update the version number in manifest.json if -v/--version flag is present
+if [[ $UPDATE_VERSION == "true" ]]; then
+    manifest_file="${dir}/manifest.json"
+    current_version=$(grep '"version"' "$manifest_file" | cut -d':' -f2 | tr -d ' ",')
+    new_version=$(increase_minor_version "$current_version")
+    sed -i "s/$current_version/$new_version/" "$manifest_file"
+    echo "Updated version in manifest.json to $new_version"
+fi
+
+# Compress the directory into a zip file
+zip -j -0 -r "${dir}.zip" "${dir}"
+
+# Remove the existintg "${dir}.xpi" file
+rm -f "${dir}.xpi"
+
+# Rename the zip file to have an .xpi extension
+mv "${dir}.zip" "${dir}.xpi"
+
+# Print a success message
+echo "Successfully created ${dir}.xpi"

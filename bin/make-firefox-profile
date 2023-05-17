@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Read the application mode from config.ini
+mode=$(grep "^MODE=" config.ini | awk -F "=" '{print $2}')
+
+# Read the path corresponding to the current mode
+if [ "$mode" = "DEV" ]; then
+    root_path=$(awk -F '=' '/^\[DEV\]/{f=1;next} /^\[/ {f=0} f && /^PATH/ {print $2}' config.ini)
+elif [ "$mode" = "DEPLOY" ]; then
+    root_path=$(awk -F '=' '/^\[DEPLOY\]/{f=1;next} /^\[/ {f=0} f && /^PATH/ {print $2}' config.ini)
+else
+    echo "Invalid mode in config.ini"
+    exit 1
+fi
+
+# Interpolate the $HOME variable in the root_path
+root_path=$(echo "${root_path}" | envsubst)
+
+# Create a directory for the profile
+#mkdir -p "${root_path}/bin/firefox/profiles/default"
+mkdir --parents "${root_path}/bin/firefox/profiles"
+
+# Create the profile that will be used by the browser
+#./bin/firefox/firefox --CreateProfile "GPTProfile ${root_path}/bin/firefox/profiles/default"
+
+echo "Setting up the default Firefox profile"
+# Remove the "${root_path}/bin/firefox/profiles/default" directory and all of its
+# contents
+rm -rf "${root_path}/bin/firefox/profiles/default"
+
+# Extract the default profile from the tarball
+tar -xf "${root_path}/bin/default-profile.tar.xz" -C "${root_path}/bin/firefox/profiles"

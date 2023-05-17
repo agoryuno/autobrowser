@@ -1,0 +1,13 @@
+#!/bin/bash
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+
+cd "$script_dir"
+cd ".."
+
+# Check if the directory exists and create it if not
+if [ ! -d "$certs_dir" ]; then
+  mkdir -p "$certs_dir"
+fi
+
+openssl req -x509 -newkey rsa:4096 -nodes -out browser/server/certs/cert.pem -keyout browser/server/certs/key.pem -days 365 -config openssl.config

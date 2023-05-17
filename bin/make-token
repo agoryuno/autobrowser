@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# script: make-token
+
+echo "make-token pwd: $(pwd)"
+
+# Read the token file name from config.ini
+file_name=$(awk -F '=' '/^\[FLASK\]/{f=1;next} /^\[/ {f=0} f && /^TOKEN_FILE/ {print $2}' "$1")
+
+echo "make-token file_name: $file_name"
+
+# Remove leading and trailing whitespace
+file_name=$(echo "$file_name" | xargs)
+
+# Generate a secure auth token and save it to the specified file
+openssl rand -base64 32 > "$file_name"
+
+echo "Auth token saved to $file_name"
