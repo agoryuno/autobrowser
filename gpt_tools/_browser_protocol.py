@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import Literal, Optional, Any, Protocol, Coroutine
-from requests.sessions import Session
 import aiohttp
 
 
