@@ -1,1 +1,2 @@
 bin/firefox/profiles/default/AlternateServices.txt
+browser/server/certs/*
