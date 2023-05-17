@@ -2,9 +2,13 @@
 
 # Convert config_file to an absolute path, relative to the script's directory
 base_dir=$(dirname $(dirname $(realpath "$0")))
-config_file=$(realpath "$base_dir/$config_file")
+config_file=$base_dir/openssl.config
 
-echo $base_dir
+# Create the SSL config file if it doesn't exist
+if [ ! -e "$config_file" ]; then
+    echo "Creating OpenSSL config file.."
+    $base_dir/bin/create-ssl-config
+fi
 
 certs_dir=$base_dir/browser/server/certs
 
@@ -15,4 +19,4 @@ fi
 
 openssl req -x509 -newkey rsa:4096 -nodes \
     -out $certs_dir/cert.pem \
-    -keyout $certs_dir/key.pem -days 365 -config openssl.config
+    -keyout $certs_dir/key.pem -days 365 -config $config_file

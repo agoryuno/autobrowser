@@ -1,11 +1,13 @@
 #!/bin/bash
 
+base_dir=$(dirname $(dirname $(realpath "$0")))
+
 # Read openssl values from config.ini
-config_file="config.ini"
+config_file="$base_dir/config.ini"
 openssl_c=$(awk -F "=" '/OPENSSL_C/ {print $2}' $config_file | tr -d ' ')
 openssl_st=$(awk -F "=" '/OPENSSL_ST/ {print $2}' $config_file | tr -d ' ')
 openssl_l=$(awk -F "=" '/OPENSSL_L/ {print $2}' $config_file | tr -d ' ')
-openssl_o=$(awk -F "=" '/OPENSSL_O/ {print $2}' $config_file | tr -d ' ')
+openssl_o=$(awk -F "=" '/OPENSSL_O($| *=)/ {print $2}' $config_file | tr -d ' ')
 openssl_ou=$(awk -F "=" '/OPENSSL_OU/ {print $2}' $config_file | tr -d ' ')
 
 # Create openssl.config
