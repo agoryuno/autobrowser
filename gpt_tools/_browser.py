@@ -80,7 +80,15 @@ class Browser(BrowserProtocol):
                             f"{self.base_url}/executeScript", 
                             json={"tab_id": tab_id, "code": code})
 
-    def inject_script(self, tab_id, code):
+    def inject_script(self, tab_id, code) -> Optional[Any]:
+        """
+        Runs Javascript code in the context of the page. Note that
+        **the code is not sandboxed** and is injected directly into the
+        page's context.
+
+        The code can return an arbitrary object by assigning it to the
+        `window.result` variable.
+        """
         result = self.request("POST",
                             f"{self.base_url}/injectScript",
                             json={"tab_id": tab_id, "code": code})
@@ -88,7 +96,7 @@ class Browser(BrowserProtocol):
             return result['result']
 
 
-    def wait_for_element(self, tab_id, selector, timeout=None):
+    def wait_for_element(self, tab_id, selector, timeout=None) -> Literal[True, False]:
         data = {"tab_id": tab_id, "selector": selector}
         if timeout:
             data["timeout"] = timeout

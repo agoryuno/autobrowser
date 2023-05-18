@@ -84,7 +84,7 @@ fi
 
 
 # Create the profile to use for the browser
-./bin/make-firefox-profile
+${root_path}/bin/make-firefox-profile
 
 # Override application.ini
 echo "[XRE] EnableProfileMigrator=0" > "${root_path}/bin/firefox/override.ini"

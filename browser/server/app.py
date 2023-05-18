@@ -172,10 +172,13 @@ def open_tab():
     return {'status': 'success' if result else 'error', 'result': result}
 
 
-
 @app.route('/injectScript', methods=['POST'])
 @require_valid_token
 def inject_script():
+    """
+    Runs the script in the browser tab.
+    A result object can be assigned to `window.result` in the script to return it.
+    """
     tab_id = request.json['tab_id']
     code = request.json['code']
     timeout = request.json.get('timeout', TIMEOUT)
@@ -231,10 +234,12 @@ def wait_for_element():
     return {'status': 'success' if result else 'error', 'result': result}
 
 
-
 @app.route('/executeScript', methods=['POST'])
 @require_valid_token
 def execute_script():
+    """
+    
+    """
     tab_id = request.json['tab_id']
     code = request.json['code']
     event = Event()
