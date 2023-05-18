@@ -1,4 +1,5 @@
 from typing import Literal, Optional, Any, Coroutine
+from typing import Union
 from requests.sessions import Session
 import aiohttp
 import asyncio
@@ -7,7 +8,8 @@ from aiohttp import TCPConnector
 
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+#from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 
 from ._browser_protocol import BrowserProtocol, BrowserAsyncProtocol, SessionProtocol
 
@@ -65,10 +67,11 @@ class Browser(BrowserProtocol):
         if result["status"] == "success":
             return result['tabs']
 
-    def open_tab(self, url: str) -> int:
+    def open_tab(self, url: str) -> Union[int, Literal[False]]:
         result = self.request("POST", f"{self.base_url}/openTab", json={"url": url})
         if result["status"] == "success":
             return result['result']
+        return False
 
     def execute_script(self, 
                        tab_id: int, 
