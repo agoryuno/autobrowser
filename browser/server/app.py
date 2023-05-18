@@ -157,6 +157,8 @@ def open_tab():
     events_by_id[request_id] = event
 
     socketio.emit('open_new_tab', {'url': _url, 'request_id': request_id})
+
+    print ("open_tab: emitted open_new_tab event")
     try:
         with Timeout(TIMEOUT):
             event.wait()
