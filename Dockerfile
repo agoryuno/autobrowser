@@ -5,8 +5,10 @@ ARG CACHE=0
 # Install necessary dependencies
 RUN apt update && apt install -y \
     #curl \
-    tar \
-    bzip2 
+    zip \
+    gettext \
+    #tar \
+    #bzip2 
     #python3 \
     #python3-pip \
     #python-is-python3 
@@ -43,10 +45,6 @@ RUN chmod +x /app/bin/install-firefox
 RUN chmod +x /app/bin/install-extension
 RUN chmod +x /app/bin/make-firefox-profile
 RUN chmod +x /app/bin/make-extension
-
-# Install extra packages
-RUN apt-get install -y gettext
-RUN apt-get install -y zip
 
 # Run the scripts
 RUN /app/bin/create-ssl-config
