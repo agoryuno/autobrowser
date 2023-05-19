@@ -1,20 +1,20 @@
-FROM ubuntu:latest
+FROM debian:stable-slim
 
 ARG CACHE=0
 
 # Install necessary dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt update && apt install -y \
     #curl \
     tar \
-    bzip2 \
-    python3 \
-    python3-pip 
+    bzip2 
+    #python3 \
+    #python3-pip 
     #libgtk-3-0 \
     #libdbus-glib-1-2 \
     #libxt6
 
 # Install Python dependencies
-RUN pip3 install flask requests gevent
+RUN pip install flask requests gevent
 
 
 # Set the working directory
@@ -30,6 +30,7 @@ COPY ./bin/create-ssl-cert /app/bin/create-ssl-cert
 COPY ./config.ini /app/config.ini
 COPY ./bin/default-profile.tar.xz /app/bin/default-profile.tar.xz
 COPY ./browser/extension /app/browser/extension
+COPY ./bin/start-firefox /app/bin/start-firefox
 
 RUN mkdir -p .temp
 COPY .temp /app/.temp
@@ -52,7 +53,7 @@ RUN /app/bin/create-ssl-cert
 
 RUN if [ "$CACHE" = "1" ]; then \
         echo "Installing Firefox from cache download..."; \
-        /app/bin/install-firefox -c .temp; \
+        /app/bin/install-firefox -c /app/.temp; \
     else \
         echo "Downloading Firefox"; \
         /app/bin/install-firefox; \
@@ -62,6 +63,9 @@ RUN apt autoremove -y
 
 # Copy your Flask application into the Docker image
 COPY ./browser/server /app/browser/server
+
+# Remove Firefox download cache
+RUN rm -r /app/.temp
 
 # Expose the port your Flask app runs on
 EXPOSE 5000
