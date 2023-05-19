@@ -1,21 +1,21 @@
-# Use an Ubuntu base image
 FROM ubuntu:latest
 
 ARG CACHE=0
 
 # Install necessary dependencies
 RUN apt-get update && apt-get install -y \
-    curl \
+    #curl \
     tar \
     bzip2 \
     python3 \
-    python3-pip \
-    libgtk-3-0 \
-    libdbus-glib-1-2 \
-    libxt6
+    python3-pip 
+    #libgtk-3-0 \
+    #libdbus-glib-1-2 \
+    #libxt6
 
-# Install Flask
-RUN pip3 install flask
+# Install Python dependencies
+RUN pip3 install flask requests gevent
+
 
 # Set the working directory
 WORKDIR /app
