@@ -1,0 +1,29 @@
+#! /bin/bash
+
+# Default values
+CACHE=0
+IMAGE_NAME="autobrowser"
+
+# Parse command line arguments
+while getopts ":c" opt; do
+  case ${opt} in
+    c )
+      CACHE=1
+      ;;
+    \? )
+      echo "Invalid Option: -$OPTARG" 1>&2
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
+# Check if image name was provided as argument
+if [ -n "$1" ]
+then
+    IMAGE_NAME=$1
+fi
+
+mkdir -p .temp
+
+docker build --build-arg CACHE=$CACHE -t $IMAGE_NAME .

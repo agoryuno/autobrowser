@@ -55,9 +55,11 @@ RUN if [ "$CACHE" = "1" ]; then \
         /app/bin/install-firefox -c .temp; \
     else \
         echo "Downloading Firefox"; \
-        /app/bin/make-firefox; \
+        /app/bin/install-firefox; \
     fi
 RUN /app/bin/install-firefox
+
+RUN apt autoremove -y
 
 # Copy your Flask application into the Docker image
 COPY ./browser/server /app/browser/server
@@ -66,4 +68,4 @@ COPY ./browser/server /app/browser/server
 EXPOSE 5000
 
 # Run the Flask server
-CMD ["python3", "/app/browser/server/app.py"]
+CMD ["python3", "/app/bin/start-firefox"]
