@@ -57,7 +57,6 @@ RUN if [ "$CACHE" = "1" ]; then \
         echo "Downloading Firefox"; \
         /app/bin/install-firefox; \
     fi
-RUN /app/bin/install-firefox
 
 RUN apt autoremove -y
 
