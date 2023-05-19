@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM python:slim-bullseye
 
 ARG CACHE=0
 
@@ -8,13 +8,14 @@ RUN apt update && apt install -y \
     tar \
     bzip2 
     #python3 \
-    #python3-pip 
+    #python3-pip \
+    #python-is-python3 
     #libgtk-3-0 \
     #libdbus-glib-1-2 \
     #libxt6
 
 # Install Python dependencies
-RUN pip install flask requests gevent
+RUN pip3 install flask requests gevent
 
 
 # Set the working directory
