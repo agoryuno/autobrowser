@@ -1,0 +1,5 @@
+Flask
+gevent
+Flask-SocketIO
+Flask-Cors
+Flask-Sessions

@@ -1,24 +1,15 @@
-FROM python:slim-bullseye
+FROM python:alpine
 
 ARG CACHE=0
 
 # Install necessary dependencies
-RUN apt update && apt install -y \
-    #curl \
-    zip \
-    gettext \
-    #tar \
-    #bzip2 
-    #python3 \
-    #python3-pip \
-    #python-is-python3 
-    #libgtk-3-0 \
-    #libdbus-glib-1-2 \
-    #libxt6
+#RUN apt update && apt install -y \
+#    zip \
+#    gettext
 
-# Install Python dependencies
-RUN pip3 install flask requests gevent
+COPY requirements.txt /
 
+RUN pip install -r /requirements.txt
 
 # Set the working directory
 WORKDIR /app
