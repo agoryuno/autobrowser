@@ -28,11 +28,15 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+base_dir=$(dirname $(dirname $(realpath "$0")))
+
 # Read the MODE value from config.ini
 mode=$(grep -A1 "\[MAIN\]" config.ini | grep "MODE" | cut -d'=' -f2)
 
 # Check if a directory argument was provided, otherwise use the default "browser/extension"
-dir="${POSITIONAL[0]:-browser/extension}"
+dir="${POSITIONAL[0]:-${base_dir}/browser/extension}"
+
+echo "make-extension: dir = ${dir}"
 
 # Update the version number in manifest.json if -v/--version flag is present
 if [[ $UPDATE_VERSION == "true" ]]; then

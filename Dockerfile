@@ -1,6 +1,8 @@
 # Use an Ubuntu base image
 FROM ubuntu:latest
 
+ARG CACHE=0
+
 # Install necessary dependencies
 RUN apt-get update && apt-get install -y \
     curl \
@@ -27,6 +29,10 @@ COPY ./bin/create-ssl-config /app/bin/create-ssl-config
 COPY ./bin/create-ssl-cert /app/bin/create-ssl-cert
 COPY ./config.ini /app/config.ini
 COPY ./bin/default-profile.tar.xz /app/bin/default-profile.tar.xz
+COPY ./browser/extension /app/browser/extension
+
+RUN mkdir -p .temp
+COPY .temp /app/.temp
 
 # Make the scripts executable
 RUN chmod +x /app/bin/create-ssl-config
@@ -43,6 +49,14 @@ RUN apt-get install -y zip
 # Run the scripts
 RUN /app/bin/create-ssl-config
 RUN /app/bin/create-ssl-cert
+
+RUN if [ "$CACHE" = "1" ]; then \
+        echo "Installing Firefox from cache download..."; \
+        /app/bin/install-firefox -c .temp; \
+    else \
+        echo "Downloading Firefox"; \
+        /app/bin/make-firefox; \
+    fi
 RUN /app/bin/install-firefox
 
 # Copy your Flask application into the Docker image

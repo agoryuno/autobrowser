@@ -18,6 +18,8 @@ fi
 # Interpolate the $HOME variable in the root_path
 root_path=$(echo "${root_path}" | envsubst)
 
+echo "make-firefox-profile: root_path = ${root_path}"
+
 # Create a directory for the profile
 #mkdir -p "${root_path}/bin/firefox/profiles/default"
 mkdir --parents "${root_path}/bin/firefox/profiles"
