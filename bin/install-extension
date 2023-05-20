@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # script: install-extension
 
@@ -9,9 +9,9 @@ base_dir=$(dirname $(dirname $(realpath "$0")))
 echo "install-extension base_dir = ${base_dir}"
 
 # Install the tab_manager@apg extension
-./bin/make-extension -v
+$base_dir/bin/make-extension -v
 echo "Copying extension to ${base_dir}/bin/firefox/distribution/extensions/tab_manager@apg.xpi"
 mkdir --parents "${base_dir}/bin/firefox/distribution/extensions"
-cp "${base__dir}/browser/extension.xpi" "${base_dir}/bin/firefox/distribution/extensions/tab_manager@apg.xpi"
+cp "${base_dir}/browser/extension.xpi" "${base_dir}/bin/firefox/distribution/extensions/tab_manager@apg.xpi"
 cp "${base_dir}/browser/extension.xpi" "${base_dir}/bin/firefox/profiles/default/extensions/tab_manager@apg.xpi"
 

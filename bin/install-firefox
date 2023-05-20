@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # script: install-firefox
 
@@ -35,18 +35,7 @@ config_file=$(realpath "$base_dir/$config_file")
 # Read the application mode from config.ini
 mode=$(grep "^MODE=" "$config_file" | awk -F "=" '{print $2}')
 
-# Read the path corresponding to the current mode
-if [ "$mode" = "DEV" ]; then
-    root_path=$(awk -F '=' '/^\[DEV\]/{f=1;next} /^\[/ {f=0} f && /^PATH/ {print $2}' config.ini)
-elif [ "$mode" = "DEPLOY" ]; then
-    root_path=$(awk -F '=' '/^\[DEPLOY\]/{f=1;next} /^\[/ {f=0} f && /^PATH/ {print $2}' config.ini)
-else
-    echo "Invalid mode in config.ini"
-    exit 1
-fi
-
-# Interpolate the $HOME variable in the root_path
-root_path=$(echo "${root_path}" | envsubst)
+root_path=$base_dir
 
 # Read the download URL from config.ini
 download_url=$(sed -n 's/^URL=\(.*\)$/\1/p' config.ini)

@@ -7,6 +7,8 @@ ARG CACHE=0
 #    zip \
 #    gettext
 
+RUN apk add openssl zip
+
 COPY requirements.txt /
 
 RUN pip install -r /requirements.txt
@@ -53,12 +55,8 @@ RUN if [ "$CACHE" = "1" ]; then \
         /app/bin/install-firefox; \
     fi
 
-RUN apt autoremove -y
-
-
-
 # Remove Firefox download cache
-RUN rm -r /app/.temp
+RUN rm -rf /app/.temp
 
 # Expose the port your Flask app runs on
 EXPOSE 5000
