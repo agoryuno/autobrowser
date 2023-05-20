@@ -1,0 +1,1 @@
+docker run -e MY_VAR=my_value -it your_image

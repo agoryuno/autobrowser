@@ -21,10 +21,13 @@ COPY ./bin/make-firefox-profile /app/bin/make-firefox-profile
 COPY ./bin/make-extension /app/bin/make-extension
 COPY ./bin/create-ssl-config /app/bin/create-ssl-config
 COPY ./bin/create-ssl-cert /app/bin/create-ssl-cert
+COPY ./bin/make-token /app/bin/make-token
 COPY ./config.ini /app/config.ini
 COPY ./bin/default-profile.tar.xz /app/bin/default-profile.tar.xz
 COPY ./browser/extension /app/browser/extension
 COPY ./bin/start-firefox /app/bin/start-firefox
+# Copy your Flask application into the Docker image
+COPY ./browser/server /app/browser/server
 
 RUN mkdir -p .temp
 COPY .temp /app/.temp
@@ -36,6 +39,7 @@ RUN chmod +x /app/bin/install-firefox
 RUN chmod +x /app/bin/install-extension
 RUN chmod +x /app/bin/make-firefox-profile
 RUN chmod +x /app/bin/make-extension
+RUN chmod +x /app/bin/make-token
 
 # Run the scripts
 RUN /app/bin/create-ssl-config
@@ -51,8 +55,7 @@ RUN if [ "$CACHE" = "1" ]; then \
 
 RUN apt autoremove -y
 
-# Copy your Flask application into the Docker image
-COPY ./browser/server /app/browser/server
+
 
 # Remove Firefox download cache
 RUN rm -r /app/.temp
@@ -61,4 +64,4 @@ RUN rm -r /app/.temp
 EXPOSE 5000
 
 # Run the Flask server
-CMD ["python3", "/app/bin/start-firefox"]
+CMD ["/app/bin/make-token", "/app/bin/start-firefox"]

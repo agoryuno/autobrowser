@@ -2,7 +2,7 @@
 
 # Default values
 CACHE=0
-IMAGE_NAME="autobrowser"
+CONFIG_FILE="config.ini"
 
 # Parse command line arguments
 while getopts ":c" opt; do
@@ -17,6 +17,14 @@ while getopts ":c" opt; do
   esac
 done
 shift $((OPTIND -1))
+
+# Check if config file exists and read docker_name
+if [ -f "$CONFIG_FILE" ]; then
+    IMAGE_NAME=$(awk -F '=' '/DOCKER_NAME/ {print $2}' $CONFIG_FILE)
+else
+    echo "Config file not found: $CONFIG_FILE"
+    exit 1
+fi
 
 # Check if image name was provided as argument
 if [ -n "$1" ]
