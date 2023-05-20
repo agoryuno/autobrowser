@@ -8,3 +8,4 @@ browser/server/__pycache__/
 gpt_tools/__pycache__/
 openssl.config
 token.txt
+test/__pycache__/
