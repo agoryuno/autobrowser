@@ -1,1 +1,34 @@
-docker run -e MY_VAR=my_value -it your_image
+#!/bin/bash
+
+CONTAINER_NAME=$1
+IMAGE_NAME="autobrowser"
+
+# Check if the image exists locally
+if [ "$(docker images -q $IMAGE_NAME)" ]; then
+    echo "Image exists locally."
+else
+    echo "Image does not exist locally. Attempting to pull..."
+    # Try to pull the image
+    docker pull $IMAGE_NAME
+
+    if [ $? -eq 0 ]; then
+        echo "Image pulled successfully."
+    else
+        echo "Image could not be pulled."
+        exit 1
+    fi
+fi
+
+# Check if the container already exists
+if [ "$(docker ps -a -q -f name=$CONTAINER_NAME)" ]; then
+    echo "Container $CONTAINER_NAME already exists."
+else
+    echo "Container does not exist. Creating now..."
+    docker run -d --name $CONTAINER_NAME $IMAGE_NAME
+fi
+
+echo "Starting the container if not already running..."
+docker start $CONTAINER_NAME
+
+echo "Reading file from the container..."
+docker exec -it $CONTAINER_NAME cat /app/token.txt > token.txt

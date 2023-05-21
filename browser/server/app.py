@@ -33,6 +33,8 @@ parser.add_argument('token_file', help='Path to the file containing the security
 parser.add_argument('config_file', help='Path to the config file')
 args = parser.parse_args()
 
+print (f"app.py: {args=}")
+
 config = configparser.ConfigParser()
 config.read(args.config_file)
 
@@ -41,7 +43,7 @@ PORT = int(config['FIREFOX']['SERVER_PORT'])
 TIMEOUT = int(config['FLASK']['TIMEOUT'])
 
 # Read security token from file
-valid_token = read_token_from_file(config)
+valid_token = read_token_from_file(args.token_file)
 utils.valid_token = valid_token
 
 print (f"App set valid token to: {valid_token}")

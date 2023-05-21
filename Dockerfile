@@ -62,4 +62,4 @@ RUN rm -rf /app/.temp
 EXPOSE 5000
 
 # Run the Flask server
-CMD ["/app/bin/make-token", "/app/bin/start-firefox"]
+CMD ["/app/bin/start-firefox"]

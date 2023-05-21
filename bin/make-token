@@ -2,17 +2,27 @@
 
 # script: make-token
 
-echo "make-token pwd: $(pwd)"
+# If a config file is provided as an argument, use it. Otherwise, default to "config.ini"
+config_file=${1:-"config.ini"}
 
-# Read the token file name from config.ini
-file_name=$(awk -F '=' '/^\[FLASK\]/{f=1;next} /^\[/ {f=0} f && /^TOKEN_FILE/ {print $2}' "$1")
+config_file=$(echo "$config_file" | xargs)
 
-echo "make-token file_name: $file_name"
+echo "make-token: config_file = $config_file"
+
+# If the default config file is being used, convert its path to an absolute one
+if [[ $1 == "" ]]; then
+    base_dir=$(dirname $(dirname $(realpath "$0")))
+    config_file=$(realpath "$base_dir/$config_file")
+fi
+
+token_file=$(awk -F '=' '/^\[FLASK\]/{f=1;next} /^\[/ {f=0} f && /^TOKEN_FILE/ {print $2}' "$config_file" | xargs)
+
+echo "make-token: token_file = $token_file"
 
 # Remove leading and trailing whitespace
-file_name=$(echo "$file_name" | xargs)
+
 
 # Generate a secure auth token and save it to the specified file
-openssl rand -base64 32 > "$file_name"
+openssl rand -base64 32 > "$token_file"
 
-echo "Auth token saved to $file_name"
+echo "make-token: Auth token saved to $token_file"

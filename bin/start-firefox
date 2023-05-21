@@ -6,7 +6,7 @@
 base_dir=$(dirname $(dirname $(realpath "$0")))
 #script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
-echo "base_dir: $base_dir"
+echo "start-firefox: base_dir = $base_dir"
 
 config_file="config.ini"
 while getopts "cf:" opt; do
@@ -35,7 +35,7 @@ token_file="$base_dir/$token_file"
 
 # Check if the token file exists, if not, create it using the 'make-token' script
 if [ ! -f "$token_file" ]; then
-  echo "Token file not found. Creating a new one.."
+  echo "start-firefox: Token file not found. Creating a new one.."
   $base_dir/bin/make-token "$config_file"
 fi
 
@@ -48,14 +48,14 @@ python app.py $token_file $config_file &
 # Change the working directory back to the script's directory
 cd $script_dir
 
-echo "start-firefox token file : $token_file"
+echo "start-firefox: token file path = $token_file"
 
-echo "Flask app starting with token: $flask_token"
+echo "start-firefox: Flask app starting with token = $flask_token"
 
 # Get the process ID of the Flask app
 flask_pid=$!
 
-echo "Flask PID: $flask_pid"
+echo "start-firefox: Flask PID = $flask_pid"
 
 # Set a timeout (in tenths of a second) for waiting for the Flask app to start
 timeout=100
@@ -69,7 +69,7 @@ done
 
 # Check if the Flask app started before the timeout expired
 if [ $elapsed_time -lt $timeout ]; then
-  echo "Flask app is running. Starting Firefox..."
+  echo "start-firefox: Flask app is running. Starting Firefox..."
   cd "$base_dir"
 
   urlencode() {
@@ -79,9 +79,9 @@ if [ $elapsed_time -lt $timeout ]; then
   enc_token=$(urlencode "$flask_token")
 
   # Execute the firefox/firefox command
-  ./bin/firefox/firefox \
-      -override "./bin/firefox/override.ini" \
-      -profile "./bin/firefox/profiles/default" \
+  $base_dir/bin/firefox/firefox \
+      -override "$base_dir/bin/firefox/override.ini" \
+      -profile "$base_dir/bin/firefox/profiles/default" \
       --no-remote "https://$server_host:$server_port/auth?token=$enc_token" &
 
   # Wait for the Firefox process to exit
@@ -90,7 +90,7 @@ if [ $elapsed_time -lt $timeout ]; then
   # Kill the Flask app
   kill $flask_pid
 else
-  echo "Flask app did not start within the specified timeout"
+  echo "start-firefox: Flask app did not start within the specified timeout"
   # Kill the Flask app
   kill $flask_pid
   exit 1

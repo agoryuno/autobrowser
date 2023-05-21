@@ -14,7 +14,7 @@ mkdir --parents "${root_path}/bin/firefox/profiles"
 # Create the profile that will be used by the browser
 #./bin/firefox/firefox --CreateProfile "GPTProfile ${root_path}/bin/firefox/profiles/default"
 
-echo "Setting up the default Firefox profile"
+echo "make-firefox-profile: Setting up the default Firefox profile"
 # Remove the "${root_path}/bin/firefox/profiles/default" directory and all of its
 # contents
 rm -rf "${root_path}/bin/firefox/profiles/default"

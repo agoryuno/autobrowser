@@ -4,12 +4,22 @@ from flask import Response, request
 
 valid_token = None
 
-def read_token_from_file(config):
+def read_token_from_file(filepath):
+    # Read the token from the file
+    with open(filepath, 'r') as f:
+        return f.read().strip()
+
+
+def read_token_from_file2(config):
     # Get the base directory
     base_directory = get_base_directory(config)
 
+    print (f"utils.py: {base_directory=}")
+
     # Get the relative path to the token file
     token_file = config.get('FLASK', 'TOKEN_FILE')
+
+    print (f"utils.py: {token_file=}")
 
     # Combine the base directory and the relative path to get the full path to the token file
     filename = os.path.join(base_directory, token_file)
