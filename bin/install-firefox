@@ -44,26 +44,30 @@ download_url=$(sed -n 's/^URL=\(.*\)$/\1/p' config.ini)
 mkdir --parents "${root_path}/.temp"
 
 if [ "$cache" = true ] && [ -f "${root_path}/.temp/firefox.tar.bz2" ]; then
-  echo "Using cached Firefox download"
+  echo "install-firefox: Using cached Firefox download"
 else
-  echo "Downloading Firefox from ${download_url}.."
+  echo "install-firefox: Downloading Firefox from ${download_url}.."
   curl -L -o "${root_path}/.temp/firefox.tar.bz2" "${download_url}"
 fi
 
 # Untar the file in the .temp directory
-echo "Expanding the Firefox installation archive.."
+echo "install-firefox: Expanding the Firefox installation archive.."
 tar -xjf "${root_path}/.temp/firefox.tar.bz2" -C "${root_path}/.temp"
 
 # Remove all contents from the "${root_path}/bin/firefox" directory
-echo "Removing the existing installation.."
+echo "install-firefox: Removing the existing installation.."
 rm -rf "${root_path}/bin/firefox"
+
+echo "install-firefox: root_path = ${root_path}"
 
 # Create the bin/firefox directory
 mkdir --parents "${root_path}/bin/firefox"
 
 # Copy the contents of the untarred directory into the bin/firefox directory
-echo "Copying files.."
+echo "install-firefox: Copying files to ${root_path}/bin/firefox"
 cp -r "${root_path}/.temp/firefox/"* "${root_path}/bin/firefox"
+
+ls -l "${root_path}/bin/firefox"
 
 # Delete the .temp directory and all of its contents, except the downloaded file, if cache flag is not set
 if [ "$cache" = false ]; then

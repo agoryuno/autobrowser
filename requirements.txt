@@ -1,5 +1,6 @@
 Flask
 gevent
+gevent-websocket
 Flask-SocketIO
 Flask-Cors
 Flask-Sessions

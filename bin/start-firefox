@@ -79,6 +79,7 @@ if [ $elapsed_time -lt $timeout ]; then
   enc_token=$(urlencode "$flask_token")
 
   # Execute the firefox/firefox command
+  ls -l "$base_dir/bin/firefox/"
   $base_dir/bin/firefox/firefox \
       -override "$base_dir/bin/firefox/override.ini" \
       -profile "$base_dir/bin/firefox/profiles/default" \

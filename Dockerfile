@@ -7,7 +7,7 @@ ARG CACHE=0
 #    zip \
 #    gettext
 
-RUN apk add openssl zip
+RUN apk add openssl zip curl
 
 COPY requirements.txt /
 
@@ -46,14 +46,7 @@ RUN chmod +x /app/bin/make-token
 # Run the scripts
 RUN /app/bin/create-ssl-config
 RUN /app/bin/create-ssl-cert
-
-RUN if [ "$CACHE" = "1" ]; then \
-        echo "Installing Firefox from cache download..."; \
-        /app/bin/install-firefox -c /app/.temp; \
-    else \
-        echo "Downloading Firefox"; \
-        /app/bin/install-firefox; \
-    fi
+RUN /app/bin/install-firefox
 
 # Remove Firefox download cache
 RUN rm -rf /app/.temp
