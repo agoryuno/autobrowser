@@ -81,15 +81,6 @@ if [ $elapsed_time -lt $timeout ]; then
   # Execute the firefox/firefox command
   echo "start-firefox:  $base_dir/bin/firefox/"
 
-  echo "start-firefox: ls -l $base_dir"
-  ls -l $base_dir
-
-  echo "start-firefox: ls -l $base_dir/bin"
-  ls -l "$base_dir/bin"
-
-  echo "start-firefox: ls -l $base_dir/bin/firefox"
-  ls -l "$base_dir/bin/firefox"
-  
 
   $base_dir/bin/firefox/firefox \
       -override "$base_dir/bin/firefox/override.ini" \

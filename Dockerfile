@@ -12,6 +12,10 @@ RUN apt update && apt install -y \
     libgtk-3-0 \
     libdbus-glib-1-2 \
     libxt6 \
+    libasound2 \
+    netcat-openbsd \
+    libxtst6 \
+    libx11-xcb1 \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -63,5 +67,4 @@ RUN rm -rf /app/.temp
 EXPOSE 5000
 
 # Run the Flask server
-#CMD ["/app/bin/start-firefox"]
-CMD ["/bin/sh"]
+CMD ["/app/bin/start-firefox"]
