@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Read the application mode from config.ini
 mode=$(grep "^MODE=" config.ini | awk -F "=" '{print $2}')

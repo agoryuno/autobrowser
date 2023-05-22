@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Set the default image name to 'autobrowser'
+IMAGE_NAME="autobrowser"
+
+# If an argument is provided, use it as the image name
+if [ $# -gt 0 ]; then
+    IMAGE_NAME=$1
+fi
+
+# Remove containers associated with the Docker image
+echo "Stopping and removing containers associated with image: $IMAGE_NAME"
+docker rm $(docker stop $(docker ps -a -q --filter ancestor=$IMAGE_NAME))
+
+# Remove the Docker image
+echo "Removing Docker image: $IMAGE_NAME"
+docker rmi $IMAGE_NAME
+
+# Remove all unused volumes
+echo "Removing unused volumes"
+docker volume prune -f
+
+# Remove the Docker cache
+echo "Removing Docker cache"
+docker system prune -f
+
+echo "Completed cleaning up for image: $IMAGE_NAME"

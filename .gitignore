@@ -9,3 +9,4 @@ gpt_tools/__pycache__/
 openssl.config
 token.txt
 test/__pycache__/
+docker.log

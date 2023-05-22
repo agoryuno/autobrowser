@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # script: install-firefox
 
@@ -65,16 +65,13 @@ mkdir --parents "${root_path}/bin/firefox"
 
 # Copy the contents of the untarred directory into the bin/firefox directory
 echo "install-firefox: Copying files to ${root_path}/bin/firefox"
-cp -r "${root_path}/.temp/firefox/"* "${root_path}/bin/firefox"
+cp -r "${root_path}/.temp/firefox" "${root_path}/bin/firefox"
 
 ls -l "${root_path}/bin/firefox"
 
-# Delete the .temp directory and all of its contents, except the downloaded file, if cache flag is not set
-if [ "$cache" = false ]; then
-  find "${root_path}/.temp" -type f -not -name 'firefox.tar.bz2' -delete
-  find "${root_path}/.temp" -type d -empty -delete
-fi
-
+echo "install-firefox: Removing Firefox installation archive.."
+# Delete the .temp directory and all of its contents
+rm -rf "${root_path}/.temp"
 
 # Create the profile to use for the browser
 ${root_path}/bin/make-firefox-profile
@@ -85,4 +82,5 @@ echo "[XRE] EnableProfileMigrator=0" > "${root_path}/bin/firefox/override.ini"
 # Install the Firefox extension
 ${root_path}/bin/install-extension ${root_path}
 
+ls -l "${root_path}/bin/firefox"
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # script: start-firefox
 
@@ -79,7 +79,18 @@ if [ $elapsed_time -lt $timeout ]; then
   enc_token=$(urlencode "$flask_token")
 
   # Execute the firefox/firefox command
-  ls -l "$base_dir/bin/firefox/"
+  echo "start-firefox:  $base_dir/bin/firefox/"
+
+  echo "start-firefox: ls -l $base_dir"
+  ls -l $base_dir
+
+  echo "start-firefox: ls -l $base_dir/bin"
+  ls -l "$base_dir/bin"
+
+  echo "start-firefox: ls -l $base_dir/bin/firefox"
+  ls -l "$base_dir/bin/firefox"
+  
+
   $base_dir/bin/firefox/firefox \
       -override "$base_dir/bin/firefox/override.ini" \
       -profile "$base_dir/bin/firefox/profiles/default" \

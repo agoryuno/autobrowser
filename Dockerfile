@@ -1,13 +1,13 @@
-FROM python:alpine
+FROM python:slim-bullseye
 
 ARG CACHE=0
 
 # Install necessary dependencies
-#RUN apt update && apt install -y \
-#    zip \
-#    gettext
+RUN apt update && apt install -y \
+    zip \
+    gettext
 
-RUN apk add openssl zip curl
+#RUN apk add openssl zip curl python
 
 COPY requirements.txt /
 
@@ -55,4 +55,5 @@ RUN rm -rf /app/.temp
 EXPOSE 5000
 
 # Run the Flask server
-CMD ["/app/bin/start-firefox"]
+#CMD ["/app/bin/start-firefox"]
+CMD ["/bin/sh"]

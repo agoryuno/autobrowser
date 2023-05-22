@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Convert config_file to an absolute path, relative to the script's directory
 base_dir=$(dirname $(dirname $(realpath "$0")))
