@@ -4,8 +4,16 @@ ARG CACHE=0
 
 # Install necessary dependencies
 RUN apt update && apt install -y \
+    curl \
     zip \
-    gettext
+    gettext \
+    bzip2 \
+    xz-utils \
+    libgtk-3-0 \
+    libdbus-glib-1-2 \
+    libxt6 \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
 
 #RUN apk add openssl zip curl python
 

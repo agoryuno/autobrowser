@@ -52,6 +52,8 @@ fi
 
 # Untar the file in the .temp directory
 echo "install-firefox: Expanding the Firefox installation archive.."
+echo "install-firefox: "
+ls -l "${root_path}/.temp"
 tar -xjf "${root_path}/.temp/firefox.tar.bz2" -C "${root_path}/.temp"
 
 # Remove all contents from the "${root_path}/bin/firefox" directory
@@ -65,7 +67,7 @@ mkdir --parents "${root_path}/bin/firefox"
 
 # Copy the contents of the untarred directory into the bin/firefox directory
 echo "install-firefox: Copying files to ${root_path}/bin/firefox"
-cp -r "${root_path}/.temp/firefox" "${root_path}/bin/firefox"
+cp -r "${root_path}/.temp/firefox" "${root_path}/bin"
 
 ls -l "${root_path}/bin/firefox"
 
