@@ -1,0 +1,22 @@
+#!/bin/bash
+# start-vnc
+
+base_dir=$(dirname $(dirname $(realpath "$0")))
+
+password=$(awk -F "=" '/VNC_PASS/ {print $2}' $base_dir/config.ini)
+password=${password// /}
+
+# Ensure Xvfb is started before x11vnc
+Xvfb :99 -screen 0 1024x768x16 &
+
+if [ -z "$password" ]
+then
+  echo "No VNC password provided. Starting VNC in unprotected mode."
+  x11vnc -display :99 --forever
+else
+  echo "Starting VNC with password protection."
+  echo $password | x11vnc -storepasswd - /root/.vncpass
+  x11vnc -rfbauth /root/.vncpass -display :99 --forever
+fi
+
+./bin/start-firefox

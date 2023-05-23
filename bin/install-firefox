@@ -52,8 +52,6 @@ fi
 
 # Untar the file in the .temp directory
 echo "install-firefox: Expanding the Firefox installation archive.."
-echo "install-firefox: "
-ls -l "${root_path}/.temp"
 tar -xjf "${root_path}/.temp/firefox.tar.bz2" -C "${root_path}/.temp"
 
 # Remove all contents from the "${root_path}/bin/firefox" directory
@@ -69,8 +67,6 @@ mkdir --parents "${root_path}/bin/firefox"
 echo "install-firefox: Copying files to ${root_path}/bin/firefox"
 cp -r "${root_path}/.temp/firefox" "${root_path}/bin"
 
-ls -l "${root_path}/bin/firefox"
-
 echo "install-firefox: Removing Firefox installation archive.."
 # Delete the .temp directory and all of its contents
 rm -rf "${root_path}/.temp"
@@ -83,6 +79,3 @@ echo "[XRE] EnableProfileMigrator=0" > "${root_path}/bin/firefox/override.ini"
 
 # Install the Firefox extension
 ${root_path}/bin/install-extension ${root_path}
-
-ls -l "${root_path}/bin/firefox"
-

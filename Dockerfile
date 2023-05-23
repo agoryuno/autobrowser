@@ -11,11 +11,14 @@ RUN apt update && apt install -y \
     xz-utils \
     libgtk-3-0 \
     libdbus-glib-1-2 \
-    libxt6 \
+    #libxt6 \
     libasound2 \
     netcat-openbsd \
-    libxtst6 \
-    libx11-xcb1 \
+    #libxtst6 \
+    #libx11-xcb1 \
+    xvfb \
+    x11vnc \
+    mawk \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -40,11 +43,11 @@ COPY ./config.ini /app/config.ini
 COPY ./bin/default-profile.tar.xz /app/bin/default-profile.tar.xz
 COPY ./browser/extension /app/browser/extension
 COPY ./bin/start-firefox /app/bin/start-firefox
-# Copy your Flask application into the Docker image
 COPY ./browser/server /app/browser/server
+COPY ./bin/start-vnc /app/bin/start-vnc
 
-RUN mkdir -p .temp
-COPY .temp /app/.temp
+#RUN mkdir -p .temp
+#COPY .temp /app/.temp
 
 # Make the scripts executable
 RUN chmod +x /app/bin/create-ssl-config
@@ -54,6 +57,8 @@ RUN chmod +x /app/bin/install-extension
 RUN chmod +x /app/bin/make-firefox-profile
 RUN chmod +x /app/bin/make-extension
 RUN chmod +x /app/bin/make-token
+RUN chmod +x /app/bin/start-firefox
+RUN chmod +x /app/bin/start-vnc
 
 # Run the scripts
 RUN /app/bin/create-ssl-config
@@ -67,4 +72,6 @@ RUN rm -rf /app/.temp
 EXPOSE 5000
 
 # Run the Flask server
-CMD ["/app/bin/start-firefox"]
+#CMD ["/app/bin/start-firefox"]
+ENV DISPLAY=:99
+CMD Xvfb :99 -screen 0 1024x768x16 & x11vnc -display :99 --forever & ./bin/start-firefox
