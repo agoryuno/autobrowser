@@ -6,7 +6,6 @@ base_dir=$(dirname $(dirname $(realpath "$0")))
 password=$(awk -F "=" '/VNC_PASS/ {print $2}' $base_dir/config.ini)
 password=${password// /}
 
-
 # remove the X11 display lock
 rm -f /tmp/.X99-lock
 
@@ -18,11 +17,19 @@ Xvfb :99 -screen 0 1024x768x16 &
 if [ -z "$password" ]
 then
   echo "No VNC password provided. Starting VNC in unprotected mode."
-  x11vnc -display :99 --forever &
+  x11vnc -ncache 10 -display :99 --forever &
 else
-  echo "Starting VNC with password protection."
-  echo $password | x11vnc -storepasswd - $base_dir/.vncpass
-  x11vnc -rfbauth $base_dir/.vncpass -display :99 --forever &
+  # check password length and character type
+  if [ ${#password} -gt 8 ] || [[ ! $password =~ ^[a-zA-Z0-9]*$ ]]
+  then
+    echo "Invalid password. Password must be alphanumeric and not longer than 8 characters."
+    exit 1
+  else
+    echo "Starting VNC with password protection."
+    echo $password
+    echo $password | x11vnc -storepasswd - $base_dir/.vncpass
+    x11vnc -ncache 10 -rfbauth $base_dir/.vncpass -display :99 --forever &
+  fi
 fi
 
 ./bin/start-firefox

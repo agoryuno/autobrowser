@@ -16,11 +16,9 @@ if [[ $1 == "" ]]; then
 fi
 
 token_file=$(awk -F '=' '/^\[FLASK\]/{f=1;next} /^\[/ {f=0} f && /^TOKEN_FILE/ {print $2}' "$config_file" | xargs)
+token_file = $base_dir/$token_file
 
 echo "make-token: token_file = $token_file"
-
-# Remove leading and trailing whitespace
-
 
 # Generate a secure auth token and save it to the specified file
 openssl rand -base64 32 > "$token_file"
