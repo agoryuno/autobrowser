@@ -9,15 +9,17 @@ config_file=$(echo "$config_file" | xargs)
 
 echo "make-token: config_file = $config_file"
 
+base_dir=$(dirname $(dirname $(realpath "$0")))
+
 # If the default config file is being used, convert its path to an absolute one
 if [[ $1 == "" ]]; then
-    base_dir=$(dirname $(dirname $(realpath "$0")))
     config_file=$(realpath "$base_dir/$config_file")
 fi
 
 token_file=$(awk -F '=' '/^\[FLASK\]/{f=1;next} /^\[/ {f=0} f && /^TOKEN_FILE/ {print $2}' "$config_file" | xargs)
-token_file = $base_dir/$token_file
+token_file="$base_dir/$token_file"
 
+echo "make-token: base_dir = $base_dir"
 echo "make-token: token_file = $token_file"
 
 # Generate a secure auth token and save it to the specified file

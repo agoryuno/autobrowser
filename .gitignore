@@ -10,3 +10,5 @@ openssl.config
 token.txt
 test/__pycache__/
 docker.log
+config.ini
+base_config.ini
