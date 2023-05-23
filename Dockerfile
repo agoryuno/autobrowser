@@ -74,4 +74,5 @@ EXPOSE 5000
 # Run the Flask server
 #CMD ["/app/bin/start-firefox"]
 ENV DISPLAY=:99
-CMD Xvfb :99 -screen 0 1024x768x16 & x11vnc -display :99 --forever & ./bin/start-firefox
+#CMD Xvfb :99 -screen 0 1024x768x16 & x11vnc -display :99 --forever & ./bin/start-firefox
+CMD ["/app/bin/start-vnc"]

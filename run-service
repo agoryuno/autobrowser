@@ -1,1 +1,17 @@
-docker run -v ./config.ini:/app/config.ini:ro -p 5900:5900 autobrowser
+#!/bin/bash
+
+CONTAINER_NAME="autobrowser-container"
+IMAGE_NAME="autobrowser"
+CONFIG_PATH="./config.ini"
+
+if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+    echo "Container is already running."
+else
+    if [ "$(docker ps -aq -f status=exited -f name=$CONTAINER_NAME)" ]; then
+        # Start the existing container
+        docker start $CONTAINER_NAME
+    else
+        # Run a new container
+        docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -p 5900:5900 $IMAGE_NAME
+    fi
+fi

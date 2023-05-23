@@ -8,6 +8,13 @@ if [ $# -gt 0 ]; then
     IMAGE_NAME=$1
 fi
 
+# Ask for user confirmation before proceeding
+read -p "Are you sure you want to cleanup the Docker environment for image $IMAGE_NAME? (y/N) " CONFIRM
+if [[ $CONFIRM != "Y" ]] && [[ $CONFIRM != "y" ]]; then
+    echo "Aborted cleanup."
+    exit 1
+fi
+
 # Remove containers associated with the Docker image
 echo "Stopping and removing containers associated with image: $IMAGE_NAME"
 docker rm $(docker stop $(docker ps -a -q --filter ancestor=$IMAGE_NAME))
