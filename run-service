@@ -4,6 +4,9 @@ CONTAINER_NAME="autobrowser-container"
 IMAGE_NAME="autobrowser"
 CONFIG_PATH="./config.ini"
 
+rm -f token.txt
+touch token.txt
+
 if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
     echo "Container is already running."
 else
@@ -12,6 +15,6 @@ else
         docker start $CONTAINER_NAME
     else
         # Run a new container
-        docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -p 5900:5900 $IMAGE_NAME
+        docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $(pwd)/token.txt:/app/token.txt -p 5900:5900 $IMAGE_NAME
     fi
 fi

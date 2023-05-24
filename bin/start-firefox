@@ -34,10 +34,14 @@ token_file=$(grep "^TOKEN_FILE" "$config_file" | awk -F'=' '{print $2}' | tr -d 
 token_file="$base_dir/$token_file"
 
 # Check if the token file exists, if not, create it using the 'make-token' script
-if [ ! -f "$token_file" ]; then
-  echo "start-firefox: Token file not found. Creating a new one.."
-  $base_dir/bin/make-token "$config_file"
-fi
+#if [ ! -f "$token_file" ]; then
+#  echo "start-firefox: Token file not found. Creating a new one.."
+#  $base_dir/bin/make-token "$config_file"
+#fi
+
+# Create a new token
+echo "Wrtiting token to $token_file"
+$base_dir/bin/make-token "$config_file"
 
 flask_token=$(cat $token_file)
 
