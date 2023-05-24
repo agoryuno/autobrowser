@@ -11,7 +11,7 @@ from requests.adapters import HTTPAdapter
 #from requests.packages.urllib3.util.retry import Retry
 from urllib3.util.retry import Retry
 
-from ._browser_protocol import BrowserProtocol, BrowserAsyncProtocol, SessionProtocol
+from ._browser_protocol import BrowserProtocol
 
 BASE_URL = "https://127.0.0.1:1837"
 
@@ -35,7 +35,9 @@ class Browser(BrowserProtocol):
             session.verify = False
 
         # Retry on failure
-        retries = Retry(total=5, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+        retries = Retry(total=5, 
+                        backoff_factor=1, 
+                        status_forcelist=[500, 502, 503, 504])
         adapter = HTTPAdapter(max_retries=retries)
         session.mount("http://", adapter)
         session.mount("https://", adapter)

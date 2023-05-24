@@ -2,19 +2,27 @@
 
 CONTAINER_NAME="autobrowser-container"
 IMAGE_NAME="autobrowser"
-CONFIG_PATH="./config.ini"
 
-rm -f token.txt
-touch token.txt
+
+# Get the base directory, which is the project's root
+base_dir=$(dirname $(realpath "$0"))
+
+CONFIG_PATH="$base_dir/config.ini"
+
+echo "run-service: base_dir = $base_dir"
+echo "run-service: CONFIG_PATH = $CONFIG_PATH"
+
+rm -f $base_dir/token.txt
+touch $base_dir/token.txt
 
 if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
     echo "Container is already running."
 else
-    if [ "$(docker ps -aq -f status=exited -f name=$CONTAINER_NAME)" ]; then
+    if [ "$(docker ps -aq -f status=exited -f status=created -f name=$CONTAINER_NAME)" ]; then
         # Start the existing container
         docker start $CONTAINER_NAME
     else
         # Run a new container
-        docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $(pwd)/token.txt:/app/token.txt -p 5900:5900 $IMAGE_NAME
+        docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $base_dir/token.txt:/app/token.txt -p 5900:5900 $IMAGE_NAME
     fi
 fi

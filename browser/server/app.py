@@ -56,10 +56,10 @@ app.config['SECRET_KEY'] = valid_token
 # Register blueprints
 app.register_blueprint(auth_blueprint, url_prefix='/')
 
-socketio = SocketIO(app, 
-                        cors_allowed_origins="*", 
-                        async_mode='gevent',
-                        )
+socketio = SocketIO(app,
+                    cors_allowed_origins="*", 
+                    async_mode='gevent',
+                    )
 
 # Define HTML content
 html_content = '''
@@ -106,6 +106,7 @@ def close_tab_by_url():
     del results_by_id[request_id]
     return {'status': 'success' if result else 'error', 'result': result}
 
+
 @app.route('/closeTabById', methods=['POST'])
 @require_valid_token
 def close_tab_by_id():
@@ -127,6 +128,7 @@ def close_tab_by_id():
     del events_by_id[request_id]
     del results_by_id[request_id]
     return {'status': 'success' if result else 'error', 'result': result}
+
 
 @app.route('/tabsList', methods=['GET'])
 @require_valid_token
@@ -332,6 +334,15 @@ def handle_response():
 # Run the Flask app with optional host and port
 if __name__ == '__main__':
     import ssl
+
+    print ("+"*80)
+    print ("+"*80)
+    print ("TESTING")
+    print ("+"*80)
+    print ("+"*80)
+    with open("certs/cert.pem", "r") as f:
+        cert = f.read()
+        print (cert)
 
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     ssl_context.load_cert_chain('certs/cert.pem', 'certs/key.pem')

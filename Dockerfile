@@ -69,7 +69,7 @@ RUN /app/bin/install-firefox
 RUN rm -rf /app/.temp
 
 # Expose the port your Flask app runs on
-EXPOSE 5000
+EXPOSE 1837
 
 # Run the Flask server
 #CMD ["/app/bin/start-firefox"]
