@@ -4,6 +4,9 @@
 base_dir=$(dirname $(dirname $(realpath "$0")))
 config_file=$base_dir/openssl.config
 
+
+echo "create-ssl-cert: base_dir = $base_dir"
+
 # Create the SSL config file if it doesn't exist
 if [ ! -e "$config_file" ]; then
     echo "Creating OpenSSL config file.."
@@ -11,6 +14,7 @@ if [ ! -e "$config_file" ]; then
 fi
 
 certs_dir=$base_dir/browser/server/certs
+echo "create-ssl-cert: certs_dir = $certs_dir"
 
 # Check if the directory exists and create it if not
 if [ ! -d "$certs_dir" ]; then

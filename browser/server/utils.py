@@ -1,4 +1,6 @@
 import os
+from urllib.parse import unquote
+
 from functools import wraps
 from flask import Response, request
 
@@ -35,6 +37,7 @@ def require_valid_token(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.args.get('token')
+        token = unquote(token)
         print ("App received token: ", token)
         print ("App is looking for token: ", valid_token)
         print ("App is comparing: ", token == valid_token)

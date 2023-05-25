@@ -46,6 +46,7 @@ COPY ./bin/start-firefox /app/bin/start-firefox
 COPY ./browser/server /app/browser/server
 COPY ./bin/start-vnc /app/bin/start-vnc
 
+
 #RUN mkdir -p .temp
 #COPY .temp /app/.temp
 
@@ -64,6 +65,8 @@ RUN chmod +x /app/bin/start-vnc
 RUN /app/bin/create-ssl-config
 RUN /app/bin/create-ssl-cert
 RUN /app/bin/install-firefox
+COPY ./browser/server/certs/cert.pem /usr/local/share/ca-certificates/cert.pem
+RUN update-ca-certificates
 
 # Remove Firefox download cache
 RUN rm -rf /app/.temp

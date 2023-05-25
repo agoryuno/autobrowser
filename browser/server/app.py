@@ -33,8 +33,6 @@ parser.add_argument('token_file', help='Path to the file containing the security
 parser.add_argument('config_file', help='Path to the config file')
 args = parser.parse_args()
 
-print (f"app.py: {args=}")
-
 config = configparser.ConfigParser()
 config.read(args.config_file)
 
@@ -334,18 +332,13 @@ def handle_response():
 # Run the Flask app with optional host and port
 if __name__ == '__main__':
     import ssl
+    import os
 
-    print ("+"*80)
-    print ("+"*80)
-    print ("TESTING")
-    print ("+"*80)
-    print ("+"*80)
-    with open("certs/cert.pem", "r") as f:
-        cert = f.read()
-        print (cert)
+    script_dir = os.path.dirname(os.path.realpath(__file__))
 
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    ssl_context.load_cert_chain('certs/cert.pem', 'certs/key.pem')
+    ssl_context.load_cert_chain(os.path.join(script_dir, 'certs/cert.pem'),
+                                os.path.join(script_dir, 'certs/key.pem'))
     
     socketio.run(
                  app, 

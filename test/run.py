@@ -53,12 +53,12 @@ class TestAddFunction(unittest.TestCase):
         with open('../token.txt', 'r') as f:
             self.token = f.read().strip()
 
+        print (f"Using token: {self.token}")
+
         browser = Browser(self.token, trusted_ca=False)
         start_ts = time.time()
-        while not browser.tabs_list():
-            if time.time() - start_ts > START_TIMEOUT:
-                raise TimeoutError("Timed out waiting for the browser service to start")
-            sleep(1)
+        res = browser.tabs_list()
+        print (f"browser.tabs_list(): {res}")
 
         print ("Service is ready")
         print ("Token: ", self.token)

@@ -3,6 +3,7 @@ from typing import Union
 from requests.sessions import Session
 import aiohttp
 import asyncio
+from urllib.parse import quote
 
 from aiohttp import TCPConnector
 
@@ -48,8 +49,11 @@ class Browser(BrowserProtocol):
                     method: Literal["POST", "GET"], 
                     url: str, 
                     **kwargs) -> dict:
+        
         # Add the token to the URL
-        url += f'?token={self.token}'
+        url += f'?token={quote(self.token)}'
+
+        print ("using url: ", url)
 
         response = self.session.request(method, url, **kwargs)
         if response.status_code == 401:
