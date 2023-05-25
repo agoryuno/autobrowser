@@ -22,6 +22,6 @@ else
         docker start $CONTAINER_NAME
     else
         # Run a new container
-        docker run -it --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $base_dir/token.txt:/app/token.txt -p 1837:1837 -p 5900:5900 $IMAGE_NAME /bin/bash
+        docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $base_dir/token.txt:/app/token.txt -p 443:443 -p 5900:5900 $IMAGE_NAME
     fi
 fi

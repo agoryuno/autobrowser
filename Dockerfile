@@ -65,14 +65,14 @@ RUN chmod +x /app/bin/start-vnc
 RUN /app/bin/create-ssl-config
 RUN /app/bin/create-ssl-cert
 RUN /app/bin/install-firefox
-COPY ./browser/server/certs/cert.pem /usr/local/share/ca-certificates/cert.pem
+COPY ./browser/server/certs/cert.pem /usr/local/share/ca-certificates/autobrowser.crt
 RUN update-ca-certificates
 
 # Remove Firefox download cache
 RUN rm -rf /app/.temp
 
 # Expose the port your Flask app runs on
-EXPOSE 1837
+EXPOSE 443
 
 # Run the Flask server
 #CMD ["/app/bin/start-firefox"]
