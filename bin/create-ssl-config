@@ -25,12 +25,12 @@ ST = ${openssl_st}
 L = ${openssl_l}
 O = ${openssl_o}
 OU = ${openssl_ou}
-CN = 127.0.0.1
+CN = 0.0.0.0
 
 [v3_req]
 keyUsage = keyEncipherment, dataEncipherment
 extendedKeyUsage = serverAuth
 
 [alt_names]
-DNS.1 = 127.0.0.1
+DNS.1 = 0.0.0.0
 EOF

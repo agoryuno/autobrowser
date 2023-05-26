@@ -19,6 +19,7 @@ RUN apt update && apt install -y \
     xvfb \
     x11vnc \
     mawk \
+    libnss3-tools \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -68,14 +69,22 @@ RUN /app/bin/install-firefox
 COPY ./browser/server/certs/cert.pem /usr/local/share/ca-certificates/autobrowser.crt
 RUN update-ca-certificates
 
-# Remove Firefox download cache
-RUN rm -rf /app/.temp
+# Add the certificate to Firefox
+RUN certutil -A -n "Autobrowser Certificate" -t "TCu,Cuw,Tuw" -i /app/browser/server/certs/cert.pem -d sql:/app/bin/firefox/profiles/default
 
-# Expose the port your Flask app runs on
+# Remove Firefox download cache
+RUN rm -rf /app/.temp/
+RUN rm -rf /app/browser/extension/
+
+# Purge unneeded packages
+RUN apt purge -y \
+    zip \
+    bzip2 \
+    xz-utils 
+    #libnss3-tools 
+RUN apt autoremove -y
+
 EXPOSE 443
 
-# Run the Flask server
-#CMD ["/app/bin/start-firefox"]
 ENV DISPLAY=:99
-#CMD Xvfb :99 -screen 0 1024x768x16 & x11vnc -display :99 --forever & ./bin/start-firefox
 CMD ["/app/bin/start-vnc"]

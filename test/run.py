@@ -151,7 +151,7 @@ class TestAddFunction(unittest.TestCase):
     def tearDown(self):
         # Stop the browser service
         try:
-            proc = subprocess.Popen(['sudo', 'docker', 'kill', 'autobrowser-container'],
+            proc = subprocess.Popen(['sudo', 'docker', 'kill', CONTAINER_NAME],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             proc.wait()
             while is_container_running('autobrowser-container'):

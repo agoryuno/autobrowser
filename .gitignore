@@ -12,3 +12,4 @@ test/__pycache__/
 docker.log
 config.ini
 base_config.ini
+flask-log.txt

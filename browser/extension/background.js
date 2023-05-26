@@ -118,7 +118,7 @@ async function injectScript_bg(tabId, source) {
 
 function setupWebSocketConnection() {
   // Create WebSocket connection using socket.io
-  const webSocketURL = 'https://127.0.0.1:1837';
+  const webSocketURL = 'https://127.0.0.1';
   const socket = io(webSocketURL);
   console.log("trying connection");
 
@@ -159,7 +159,7 @@ function setupWebSocketConnection() {
 
   async function postResult(result, requestId) {
     console.log(result);
-    fetch('https://127.0.0.1:1837/response', {
+    fetch('https://127.0.0.1/response', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -206,7 +206,7 @@ socket.on('get_tab_html', async (data) => {
 }
 
 async function loadLibraries() {
-  const socketIoLib = 'https://127.0.0.1:1837/static/socket.io.js';
+  const socketIoLib = 'https://127.0.0.1/static/socket.io.js';
   await import(socketIoLib);
 }
 
