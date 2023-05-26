@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Get the base directory, which is the project's root
+base_dir=$(dirname $(realpath "$0"))
+
+IMAGE_NAME="autobrowser"
+CONFIG_PATH="$base_dir/config.ini"
+CONTAINER_NAME="autobrowser-it"
+
+docker kill $CONTAINER_NAME
+docker rm $CONTAINER_NAME
+
+rm -f $base_dir/flask-log.txt
+touch $base_dir/flask-log.txt
+docker run -it --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $base_dir/token.txt:/app/token.txt -v $base_dir/flask-log.txt:/app/flask-log.txt -p 443:443 -p 5900:5900 $IMAGE_NAME /bin/bash

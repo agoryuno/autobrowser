@@ -19,8 +19,11 @@ import utils
 from utils import read_token_from_file
 from utils import require_valid_token
 from auth import auth_blueprint, requires_login
+from utils import setup_logger
 
-logging.basicConfig(level=logging.DEBUG)
+logger = setup_logger('/app/flask-log.txt')
+
+logger.setLevel(logging.DEBUG)
 
 # The dictionary to hold request ids
 events_by_id = {}
@@ -79,6 +82,7 @@ html_content = '''
 @app.route('/')
 @requires_login
 def root():
+    logger.debug('root() called')
     # Return the HTML content as a response with a content type of 'text/html'
     return Response(html_content, content_type='text/html')
 
@@ -135,6 +139,8 @@ def get_tabs():
     request_id = str(uuid.uuid4())
     events_by_id[request_id] = event
 
+    logger.debug(f'get_tabs: {request_id=}')
+    logger.debug('get_tabs: emitting tabs_list event')
     socketio.emit('tabs_list', {'request_id': request_id})
 
     try:
@@ -290,6 +296,7 @@ def get_tab_html(tab_id):
 @socketio.on('connect')
 @requires_login
 def handle_connect():
+    logger.debug('Client connected: %s', request.sid)
     print('Client connected:', request.sid)
 
 
@@ -336,15 +343,40 @@ if __name__ == '__main__':
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
-    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    ssl_context.load_cert_chain(os.path.join(script_dir, 'certs/cert.pem'),
-                                os.path.join(script_dir, 'certs/key.pem'))
+    cert_path = os.path.join(script_dir, 'certs/cert.pem')
+    key_path = os.path.join(script_dir, 'certs/key.pem')
     
+    # Check if certificate file exists and is readable
+    if not os.path.exists(cert_path):
+        raise FileNotFoundError(f"Certificate file not found: {cert_path}")
+    if not os.access(cert_path, os.R_OK):
+        raise PermissionError(f"Cannot read certificate file: {cert_path}")
+
+    # Check if key file exists and is readable
+    if not os.path.exists(key_path):
+        raise FileNotFoundError(f"Key file not found: {key_path}")
+    if not os.access(key_path, os.R_OK):
+        raise PermissionError(f"Cannot read key file: {key_path}")
+
+    # Read in the cert file
+    with open(cert_path, 'r') as f:
+        cert = f.read()
+        logger.debug("Loaded cert file: %s", cert_path)
+    # Read in the key file
+    with open(key_path, 'r') as f:
+        key = f.read()
+        logger.debug("Loaded key file: %s", key_path)
+
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_context.load_cert_chain(cert_path,
+                                key_path)
+    
+    logger.debug("Starting server on %s:%s", HOST, PORT)
     socketio.run(
                  app, 
                  host=HOST, 
                  port=PORT, 
-                 debug=True,
+                 #debug=True,
                  ssl_context=ssl_context,
                  )
 

@@ -1,0 +1,10 @@
+2023-05-26 10:16:38,803 - utils - DEBUG - Loaded cert file: /app/browser/server/certs/cert.pem
+2023-05-26 10:16:38,804 - utils - DEBUG - Loaded key file: /app/browser/server/certs/key.pem
+2023-05-26 10:16:38,806 - utils - DEBUG - Starting server on 0.0.0.0:443
+2023-05-26 10:18:02,013 - utils - DEBUG - Loaded cert file: /app/browser/server/certs/cert.pem
+2023-05-26 10:18:02,014 - utils - DEBUG - Loaded key file: /app/browser/server/certs/key.pem
+2023-05-26 10:18:02,016 - utils - DEBUG - Starting server on 0.0.0.0:443
+2023-05-26 10:18:03,536 - utils - DEBUG - get_tabs: request_id='62b26142-595b-41b5-88a9-725061096fe6'
+2023-05-26 10:18:03,536 - utils - DEBUG - get_tabs: emitting tabs_list event
+2023-05-26 10:19:03,646 - utils - DEBUG - get_tabs: request_id='1ec936cb-84b3-4cf8-bf2d-d107a3b72496'
+2023-05-26 10:19:03,647 - utils - DEBUG - get_tabs: emitting tabs_list event

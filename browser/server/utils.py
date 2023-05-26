@@ -1,10 +1,43 @@
 import os
 from urllib.parse import unquote
+import logging
 
 from functools import wraps
 from flask import Response, request
 
 valid_token = None
+
+
+def setup_logger(log_file, logger_name=__name__, level=logging.DEBUG):
+    """
+    Set up logging configuration.
+
+    Parameters:
+    - log_file: Path to the log file.
+    - logger_name: Name of the logger. Default is __name__.
+    - level: Log level. Default is logging.DEBUG.
+    """
+
+    # Create a logger object
+    logger = logging.getLogger(logger_name)
+
+    # Set the log level you want -- DEBUG, INFO, WARNING, ERROR, CRITICAL
+    logger.setLevel(level)
+
+    # Create a file handler object
+    file_handler = logging.FileHandler(log_file)
+
+    # Create a formatter object
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    # Set the formatter for the file handler object
+    file_handler.setFormatter(formatter)
+
+    # Add the file handler to the logger
+    logger.addHandler(file_handler)
+
+    return logger
+
 
 def read_token_from_file(filepath):
     # Read the token from the file
