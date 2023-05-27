@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Generate a new profile id
+prof_id=$1
+echo "make-firefox-profile: prof_id = ${prof_id}"
+
 # Read the application mode from config.ini
 mode=$(grep "^MODE=" config.ini | awk -F "=" '{print $2}')
 
@@ -10,14 +14,36 @@ echo "make-firefox-profile: root_path = ${root_path}"
 # Create a directory for the profile
 #mkdir -p "${root_path}/bin/firefox/profiles/default"
 mkdir --parents "${root_path}/bin/firefox/profiles"
-
-# Create the profile that will be used by the browser
-#./bin/firefox/firefox --CreateProfile "GPTProfile ${root_path}/bin/firefox/profiles/default"
+mkdir --parents "/root/.mozilla/firefox"
 
 echo "make-firefox-profile: Setting up the default Firefox profile"
 # Remove the "${root_path}/bin/firefox/profiles/default" directory and all of its
 # contents
 rm -rf "${root_path}/bin/firefox/profiles/default"
+rm -rf /root/.mozilla/firefox/default
 
 # Extract the default profile from the tarball
 tar -xf "${root_path}/bin/default-profile.tar.xz" -C "${root_path}/bin/firefox/profiles"
+tar -xf "${root_path}/bin/default-profile.tar.xz" -C /root/.mozilla/firefox
+
+#echo "make-firefox-profile: Renaming the default profile to ${prof_id}.default"
+#ls -l /root/.mozilla/firefox
+
+#mv /root/.mozilla/firefox/default "/root/.mozilla/firefox/${prof_id}.default"
+
+# Override application.ini
+echo "[XRE] EnableProfileMigrator=0" > "${root_path}/bin/firefox/override.ini"
+
+# Generate the 'profiles.ini' file
+cat << EOF > /root/.mozilla/firefox/profiles.ini
+[Profile0]
+Name=default
+IsRelative=1
+Path=${prof_id}.default
+Default=1
+
+[General]
+StartWithLastProfile=1
+Version=2
+EOF
+

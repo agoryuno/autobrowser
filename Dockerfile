@@ -46,6 +46,7 @@ COPY ./browser/extension /app/browser/extension
 COPY ./bin/start-firefox /app/bin/start-firefox
 COPY ./browser/server /app/browser/server
 COPY ./bin/start-vnc /app/bin/start-vnc
+COPY ./bin/install-certs /app/bin/install-certs
 
 
 #RUN mkdir -p .temp
@@ -61,20 +62,36 @@ RUN chmod +x /app/bin/make-extension
 RUN chmod +x /app/bin/make-token
 RUN chmod +x /app/bin/start-firefox
 RUN chmod +x /app/bin/start-vnc
+RUN chmod +x /app/bin/install-certs
 
 # Run the scripts
 RUN /app/bin/create-ssl-config
 RUN /app/bin/create-ssl-cert
+RUN cp /app/browser/server/certs/cert.pem /usr/local/share/ca-certificates/autobrowser.crt
+
 RUN /app/bin/install-firefox
-COPY ./browser/server/certs/cert.pem /usr/local/share/ca-certificates/autobrowser.crt
+
+RUN echo "PROFILE_ID=$(tr -dc 'a-z' < /dev/urandom | head -c1)$(tr -dc 'a-z0-9' < /dev/urandom | head -c7)" > /etc/profile.d/profile_id.sh && \
+    chmod +x /etc/profile.d/profile_id.sh
+
+# Load environment variables
+SHELL ["/bin/bash", "-c", "-l"]
+
+# Then source the environment variables explicitly before each RUN command that needs them
+RUN source /etc/profile.d/profile_id.sh
+RUN echo $PROFILE_ID
+
+RUN /app/bin/make-firefox-profile $PROFILE_ID
 RUN update-ca-certificates
+RUN /app/bin/install-extension
 
 # Add the certificate to Firefox
-RUN certutil -A -n "Autobrowser Certificate" -t "TCu,Cuw,Tuw" -i /app/browser/server/certs/cert.pem -d sql:/app/bin/firefox/profiles/default
+RUN /app/bin/install-certs $PROFILE_ID
 
 # Remove Firefox download cache
 RUN rm -rf /app/.temp/
 RUN rm -rf /app/browser/extension/
+RUN rm -f /app/bin/default-profile.tar.xz
 
 # Purge unneeded packages
 RUN apt purge -y \

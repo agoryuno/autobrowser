@@ -2,6 +2,17 @@
 
 # script: start-firefox
 
+# A function to extract the path to the default Firefox profile
+get_default_profile_path() {
+    awk -F "=" '
+    /^\[Profile/ {p=1; d=0; path=""}
+    /^Default=1/ && p {d=1}
+    /^Path=/ && p {path=$2} 
+    d && path {print path; exit}
+    ' /root/.mozilla/firefox/profiles.ini
+}
+
+
 # Get the base directory, which is the project's root
 base_dir=$(dirname $(dirname $(realpath "$0")))
 #script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -85,10 +96,11 @@ if [ $elapsed_time -lt $timeout ]; then
   # Execute the firefox/firefox command
   echo "start-firefox:  $base_dir/bin/firefox/"
 
+  echo "start-firefox: profile directory = /root/.mozilla/firefox/$(get_default_profile_path)"
 
   $base_dir/bin/firefox/firefox \
       -override "$base_dir/bin/firefox/override.ini" \
-      -profile "$base_dir/bin/firefox/profiles/default" \
+      -profile "/root/.mozilla/firefox/$(get_default_profile_path)" \
       --no-remote "https://$server_host:$server_port/auth?token=$enc_token" &
 
   # Wait for the Firefox process to exit

@@ -72,10 +72,7 @@ echo "install-firefox: Removing Firefox installation archive.."
 rm -rf "${root_path}/.temp"
 
 # Create the profile to use for the browser
-${root_path}/bin/make-firefox-profile
-
-# Override application.ini
-echo "[XRE] EnableProfileMigrator=0" > "${root_path}/bin/firefox/override.ini"
+#${root_path}/bin/make-firefox-profile
 
 # Install the Firefox extension
-${root_path}/bin/install-extension ${root_path}
+#${root_path}/bin/install-extension ${root_path}
