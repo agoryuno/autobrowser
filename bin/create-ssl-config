@@ -37,4 +37,5 @@ subjectAltName = @alt_names
 [alt_names]
 DNS.1=${openssl_domain}
 IP.1=127.0.0.1
+IP.2=0.0.0.0
 EOF

@@ -14,7 +14,7 @@ from urllib3.util.retry import Retry
 
 from ._browser_protocol import BrowserProtocol
 
-BASE_URL = "https://127.0.0.1"
+BASE_URL = "https://localhost"
 
 
 class Browser(BrowserProtocol):
