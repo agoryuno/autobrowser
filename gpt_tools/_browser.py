@@ -72,6 +72,7 @@ class Browser(BrowserProtocol):
         result = self.request("GET", f"{self.base_url}/tabsList")
         if result["status"] == "success":
             return result['tabs']
+        print ("tabs_list() result: ", result)
 
     def open_tab(self, url: str) -> Union[int, Literal[False]]:
         result = self.request("POST", f"{self.base_url}/openTab", json={"url": url})

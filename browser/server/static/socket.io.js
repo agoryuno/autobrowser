@@ -6043,4 +6043,4 @@ module.exports = yeast;
 
 /******/ });
 });
-//# sourceMappingURL=http://127.0.0.1:6758/resources/js/socket.io.js.map
+//# sourceMappingURL=http://localhost/resources/js/socket.io.js.map

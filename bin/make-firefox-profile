@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# script: make-firefox-profile
+
+echo "Executing make-firefox-profile"
+
 # Generate a new profile id
 prof_id=$1
 echo "make-firefox-profile: prof_id = ${prof_id}"
@@ -29,7 +33,7 @@ tar -xf "${root_path}/bin/default-profile.tar.xz" -C /root/.mozilla/firefox
 #echo "make-firefox-profile: Renaming the default profile to ${prof_id}.default"
 #ls -l /root/.mozilla/firefox
 
-#mv /root/.mozilla/firefox/default "/root/.mozilla/firefox/${prof_id}.default"
+mv /root/.mozilla/firefox/default "/root/.mozilla/firefox/${prof_id}.default"
 
 # Override application.ini
 echo "[XRE] EnableProfileMigrator=0" > "${root_path}/bin/firefox/override.ini"

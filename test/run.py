@@ -4,10 +4,18 @@ sys.path.append('..')
 import subprocess
 import unittest
 import time
+import logging
 from time import sleep
 
 from gpt_tools import Browser
 
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, 
+                    format='[%(asctime)s] %(levelname)s: %(message)s', 
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
+logger = logging.getLogger(__name__)
 
 class PortOccupied(Exception):
     ...
@@ -50,7 +58,7 @@ def run_shell_script(script_path):
         # The 'sudo' command will prompt for a password unless you've configured sudo to run without it for your user
         subprocess.Popen(['sudo', '/bin/bash', script_path])
     except Exception as e:
-        print(f"An error occurred while trying to run the script: {e}")
+        logger.error(f"An error occurred while trying to run the script: {e}")
 
 
 def restart_container(image_name=IMAGE_NAME, 
@@ -80,14 +88,14 @@ def restart_container(image_name=IMAGE_NAME,
                                 stdout=subprocess.PIPE, 
                                 stderr=subprocess.PIPE)
 
-        print (f"Started the container: {result.stdout=}, {result.stderr=}")
+        logger.info (f"Started the container: {result.stdout=}, {result.stderr=}")
         start_ts = time.time()
         while not is_container_running(container_name):
             sleep(1)
             if time.time() - start_ts > START_TIMEOUT:
                 raise TimeoutError("Timed out while waiting for the container to start")
     except subprocess.CalledProcessError as e:
-        print(f"Docker command failed: {e.stderr}")
+        logger.error(f"Docker command failed: {e.stderr}")
         proc = subprocess.Popen(['sudo', 'docker', 'kill', container_name],
                                 stderr=subprocess.DEVNULL,
                                 stdout=subprocess.DEVNULL,)
@@ -100,7 +108,7 @@ def restart_container(image_name=IMAGE_NAME,
             raise PortOccupied(e.stderr)
         
     except Exception as e:
-        print(f"An error occurred while trying to restart the container: {e}")
+        logger.error(f"An error occurred while trying to restart the container: {e}")
 
 
 def is_container_running(container_name):
@@ -111,7 +119,7 @@ def is_container_running(container_name):
         else:
             return False
     except Exception as e:
-        print(f"An error occurred while checking the container status: {e}")
+        logger.error(f"An error occurred while checking the container status: {e}")
         return False
 
 
@@ -120,10 +128,11 @@ class TestAddFunction(unittest.TestCase):
  
     def setUp(self):
 
+        logger.debug ("Test:: Setting up the tests")
         try:
             restart_container()
         except PortOccupied:
-            print ("One of the service's ports is occupied. "
+            logger.error ("One of the service's ports is occupied. "
                    "This likely means that a different container is already running. "
                    "Stop all running containers before running the tests.")
             kill_container()
@@ -135,16 +144,16 @@ class TestAddFunction(unittest.TestCase):
             kill_container()
             raise
         
-        print (f"Using token: {self.token}")
+        logger.debug (f"Test:: Using token: {self.token}")
 
         try:
             browser = Browser(self.token, trusted_ca=False)
             res = browser.tabs_list()
-            print (f"browser.tabs_list(): {res}")
+            logger.debug (f"Test:: browser.tabs_list(): {res}")
 
-            print ("Service is ready")
+            logger.debug ("Test:: Service is ready")
         except Exception as e:
-            print(f"An error occurred while trying to connect to the service: {e}")
+            logger.error(f"Test:: An error occurred while trying to connect to the service: {e}")
             kill_container()
             sys.exit(1)
 
@@ -156,11 +165,12 @@ class TestAddFunction(unittest.TestCase):
             proc.wait()
             while is_container_running('autobrowser-container'):
                 sleep(1)
-            print ("Stopped the browser service")
+            logger.debug ("Stopped the browser service")
         except Exception as e:
-            print(f"An error occurred while trying to stop the service: {e}")
+            logger.error(f"An error occurred while trying to stop the service: {e}")
         
     def test_sync_browser(self):
+        logger.debug ("Test:: test_sync_browser")
         browser = Browser(self.token, trusted_ca=False)
         tabs = browser.tabs_list()
         print (tabs)

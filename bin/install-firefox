@@ -2,6 +2,8 @@
 
 # script: install-firefox
 
+echo "Executing install-firefox"
+
 # This installs the latest development version of Firefox
 # The development version is needed to install the unsigned
 # extension

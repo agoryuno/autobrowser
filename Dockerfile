@@ -19,6 +19,7 @@ COPY ./bin/start-firefox /app/bin/start-firefox
 COPY ./browser/server /app/browser/server
 COPY ./bin/start-vnc /app/bin/start-vnc
 COPY ./bin/install-certs /app/bin/install-certs
+COPY ./bin/cleanup /app/bin/cleanup
 COPY requirements.txt /
 
 # Install necessary dependencies
@@ -49,6 +50,7 @@ RUN apt update && apt install -y \
     chmod +x /app/bin/start-firefox && \
     chmod +x /app/bin/start-vnc && \
     chmod +x /app/bin/install-certs && \
+    chmod +x /app/bin/cleanup && \
     /app/bin/create-ssl-config && \
     /app/bin/create-ssl-cert && \
     cp /app/browser/server/certs/cert.pem /usr/local/share/ca-certificates/autobrowser.crt && \
@@ -63,11 +65,9 @@ SHELL ["/bin/bash", "-c", "-l"]
 RUN source /etc/profile.d/profile_id.sh && \
     /app/bin/make-firefox-profile $PROFILE_ID && \
     update-ca-certificates && \
-    /app/bin/install-extension && \
+    /app/bin/install-extension $PROFILE_ID && \
     /app/bin/install-certs $PROFILE_ID && \
-    rm -rf /app/.temp/ && \
-    rm -rf /app/browser/extension/ && \
-    rm -f /app/bin/default-profile.tar.xz && \
+    /app/bin/cleanup && \
     apt purge -y \
     curl \
     zip \

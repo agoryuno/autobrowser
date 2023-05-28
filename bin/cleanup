@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# script: cleanup
+
+rm -rf /app/.temp/
+#rm -rf /app/browser/extension/ 
+rm -f /app/bin/default-profile.tar.xz

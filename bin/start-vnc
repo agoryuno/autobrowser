@@ -12,7 +12,7 @@ rm -f /tmp/.X99-lock
 export DISPLAY=:99
 
 # Ensure Xvfb is started before x11vnc
-Xvfb :99 -screen 0 1024x768x16 &
+Xvfb :99 -screen 0 1680x1024x16 &
 
 if [ -z "$password" ]
 then

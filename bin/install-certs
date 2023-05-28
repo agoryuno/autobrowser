@@ -2,14 +2,9 @@
 
 # script: install-certs
 
+echo "Executing install-certs"
+
 prof_id=$1
 
-echo 'install-certs: '
-ls -l "/root/.mozilla/firefox/default"
-echo "install-certs: sql:/root/.mozilla/firefox/default"
-
-certutil -A -n "Autobrowser Certificate" -t "TC,C,T" -i /app/browser/server/certs/cert.pem -d "sql:/root/.mozilla/firefox/default"
-certutil -V -d /root/.mozilla/firefox/default -n "Autobrowser Certificate" -u V
-
-echo "install-certs: Renaming default profile to ${prof_id}.default"
-mv /root/.mozilla/firefox/default /root/.mozilla/firefox/${prof_id}.default
+certutil -A -n "Autobrowser Certificate" -t "TC,C,T" -i /app/browser/server/certs/cert.pem -d "sql:/root/.mozilla/firefox/${prof_id}.default"
+certutil -V -d /root/.mozilla/firefox/${prof_id}.default -n "Autobrowser Certificate" -u V
