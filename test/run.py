@@ -126,7 +126,8 @@ def is_container_running(container_name):
 
 class TestAddFunction(unittest.TestCase):
  
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
 
         logger.debug ("Test:: Setting up the tests")
         try:
@@ -139,16 +140,19 @@ class TestAddFunction(unittest.TestCase):
             sys.exit(1)
 
         try:
-            self.token = read_token()
+            cls.token = read_token()
         except:
             kill_container()
             raise
         
-        logger.debug (f"Test:: Using token: {self.token}")
+        logger.debug (f"Test:: Using token: {cls.token}")
 
         try:
-            browser = Browser(self.token, trusted_ca=False)
+            browser = Browser(cls.token, trusted_ca=False)
             res = browser.tabs_list()
+            while not res:
+                sleep(1)
+                res = browser.tabs_list()
             logger.debug (f"Test:: browser.tabs_list(): {res}")
 
             logger.debug ("Test:: Service is ready")
@@ -157,7 +161,8 @@ class TestAddFunction(unittest.TestCase):
             kill_container()
             sys.exit(1)
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         # Stop the browser service
         try:
             proc = subprocess.Popen(['sudo', 'docker', 'kill', CONTAINER_NAME],
@@ -169,11 +174,18 @@ class TestAddFunction(unittest.TestCase):
         except Exception as e:
             logger.error(f"An error occurred while trying to stop the service: {e}")
         
-    def test_sync_browser(self):
-        logger.debug ("Test:: test_sync_browser")
-        browser = Browser(self.token, trusted_ca=False)
+    def test_tabsList(self):
+        browser = Browser(TestAddFunction.token, trusted_ca=False)
         tabs = browser.tabs_list()
-        print (tabs)
+        self.assertIsInstance(tabs, list)
+        self.assertGreaterEqual(len(tabs), 1)
+        self.assertIsInstance(tabs[0], dict)
+
+    def test_openUrl(self):
+        browser = Browser(TestAddFunction.token, trusted_ca=False)
+        res = browser.open_tab("www.google.com")
+        self.assertIsInstance(res, int)
+        logger.debug(f"test_openUrl: {res}")
 
 
 if __name__ == '__main__':

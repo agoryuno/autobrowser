@@ -18,8 +18,8 @@ reset sessions on a timer or some other way to be decided later.
 from functools import wraps
 import logging
 
-from flask import Blueprint
-from flask import request, redirect, url_for, session
+from flask import Blueprint, current_app
+from flask import redirect, url_for, session
 
 from utils import require_valid_token
 
@@ -34,7 +34,11 @@ auth_blueprint = Blueprint('auth', __name__)
 @require_valid_token
 def auth():
     session['logged_in'] = True
-    logging.info('User logged in successfully.')
+    logging.info(f'User logged in successfully. {session=}')
+    logging.info(f"{current_app.config['SECRET_KEY']=}")
+    logging.info(f"{current_app.config['SESSION_COOKIE_NAME']=}")
+    logging.info(f"{current_app.config['SESSION_COOKIE_DOMAIN']=}")
+    logging.info(f"{current_app.config['SESSION_COOKIE_PATH']=}")
     return redirect(url_for('root'))
 
 
@@ -47,7 +51,11 @@ def requires_login(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'logged_in' not in session:
-            logging.error('Unauthorized access attempt. User not logged in.')
+            logging.error(f'Unauthorized access attempt. User not logged in. {session=}')
+            logging.info(f"{current_app.config['SECRET_KEY']=}")
+            logging.info(f"{current_app.config['SESSION_COOKIE_NAME']=}")
+            logging.info(f"{current_app.config['SESSION_COOKIE_DOMAIN']=}")
+            logging.info(f"{current_app.config['SESSION_COOKIE_PATH']=}")
             return redirect(url_for('auth.auth'))
         return f(*args, **kwargs)
     return decorated_function

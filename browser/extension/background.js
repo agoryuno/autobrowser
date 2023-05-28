@@ -118,7 +118,7 @@ async function injectScript_bg(tabId, source) {
 
 function setupWebSocketConnection() {
   // Create WebSocket connection using socket.io
-  const webSocketURL = 'https://localhost';
+  const webSocketURL = 'https://0.0.0.0/';
   const socket = io(webSocketURL);
   console.log("trying connection");
 
@@ -132,7 +132,7 @@ function setupWebSocketConnection() {
   });
 
   socket.on('tabs_list', async (data) => {
-    //console.log("tabs_list request received");
+    console.log("tabs_list request received");
     const tabList = await listTabs();
     socket.emit('message', { result: tabList, request_id: data['request_id'] });
   });
