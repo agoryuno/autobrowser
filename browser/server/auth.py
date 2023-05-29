@@ -35,10 +35,6 @@ auth_blueprint = Blueprint('auth', __name__)
 def auth():
     session['logged_in'] = True
     logging.info(f'User logged in successfully. {session=}')
-    logging.info(f"{current_app.config['SECRET_KEY']=}")
-    logging.info(f"{current_app.config['SESSION_COOKIE_NAME']=}")
-    logging.info(f"{current_app.config['SESSION_COOKIE_DOMAIN']=}")
-    logging.info(f"{current_app.config['SESSION_COOKIE_PATH']=}")
     return redirect(url_for('root'))
 
 

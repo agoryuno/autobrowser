@@ -101,7 +101,8 @@ def close_tab_by_url():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for closeTabByUrl'}, 408
+        return {'status': 'error', 'message': 'Timeout waiting for closeTabByUrl',
+                'error': 'timeout'}, 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -124,7 +125,8 @@ def close_tab_by_id():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for closeTabById'}, 408
+        return {'status': 'error', 'message': 'Timeout waiting for closeTabById',
+                'error': 'timeout'}, 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -148,7 +150,8 @@ def get_tabs():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for tabs list'}, 408
+        return {'status': 'error', 'message': 'Timeout waiting for tabs list',
+                'error': 'timeout'}, 408
 
     tabs = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -172,7 +175,8 @@ def open_tab():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for openTab'}, 408
+        return {'status': 'error', 'message': 'Timeout waiting for openTab',
+                'error': 'timeout'}, 408
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -203,7 +207,8 @@ def inject_script():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for openTab'}, 408
+        return {'status': 'error', 'message': 'Timeout waiting for openTab',
+                'error': 'timeout'}, 408
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -234,7 +239,8 @@ def wait_for_element():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for waitForElement'}, 408
+        return {'status': 'error', 'message': 'Timeout waiting for waitForElement',
+                'error': 'timeout'}, 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -263,7 +269,8 @@ def execute_script():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for openTab'}, 408
+        return {'status': 'error', 'message': 'Timeout waiting for openTab',
+                'error': 'timeout'}, 408
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -285,7 +292,8 @@ def get_tab_html(tab_id):
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for getTabHTML'}, 408
+        return {'status': 'error', 'message': 'Timeout waiting for getTabHTML',
+                'error': 'timeout'}, 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]

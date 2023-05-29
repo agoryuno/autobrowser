@@ -113,12 +113,16 @@ class Browser(BrowserProtocol):
                             json=data)
         if result["status"] == "success":
             return True
+        elif result["status"] == "error":
+            if result.get('error') == 'timeout':
+                raise TimeoutError(f"Timeout waiting for element {selector} in tab {tab_id}")
         return False
 
-    def get_tab_html(self, tab_id: int) -> Optional[str]:
+    def get_tab_html(self, tab_id: int) -> Union[str, dict]:
         result = self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}")
         if result["status"] == "success":
             return result['result']
+        return result
 
     def close(self):
         self.session.close()

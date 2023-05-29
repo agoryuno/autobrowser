@@ -6,6 +6,8 @@ import unittest
 import time
 import logging
 from time import sleep
+from html.parser import HTMLParser
+
 
 from gpt_tools import Browser
 
@@ -22,6 +24,18 @@ class PortOccupied(Exception):
 
 class EmptyToken(Exception):
     ...
+
+class MyHTMLParser(HTMLParser):
+    def error(self, message):
+        raise ValueError(message)
+
+def is_valid_html(html):
+    parser = MyHTMLParser()
+    try:
+        parser.feed(html)
+    except ValueError:
+        return False
+    return True
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 CONFIG_PATH = os.path.join(BASE_DIR, 'config.ini')
@@ -52,6 +66,7 @@ def kill_container(container_name=CONTAINER_NAME):
                             stdout=subprocess.DEVNULL, 
                             stderr=subprocess.DEVNULL)
     proc.wait()
+
 
 def run_shell_script(script_path):
     try:
@@ -123,7 +138,6 @@ def is_container_running(container_name):
         return False
 
 
-
 class TestAddFunction(unittest.TestCase):
  
     @classmethod
@@ -183,10 +197,28 @@ class TestAddFunction(unittest.TestCase):
 
     def test_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        res = browser.open_tab("www.google.com")
-        self.assertIsInstance(res, int)
-        logger.debug(f"test_openUrl: {res}")
+        tab_id = browser.open_tab("https://www.google.com")
+        self.assertIsInstance(tab_id, int)
+        self.assertTrue(browser.close_tab_by_id(tab_id))
 
+    def test_close_tab_by_id(self):
+        browser = Browser(TestAddFunction.token, trusted_ca=False)
+        res = browser.close_tab_by_id(18446744073709551615)
+        self.assertFalse(res)
+
+    def test_get_tab_html(self):
+        browser = Browser(TestAddFunction.token, trusted_ca=False)
+        tab_id = browser.open_tab("https://www.google.com")
+        browser.wait_for_element(tab_id, "html body form textarea")
+        html = browser.get_tab_html(tab_id)
+        self.assertIsInstance(html, str)
+        self.assertTrue(is_valid_html(html))
+
+    def atest_wait_for_element(self):
+        browser = Browser(TestAddFunction.token, trusted_ca=False)
+        tab_id = browser.open_tab("https://www.google.com")
+        res = browser.wait_for_element(tab_id, "html body form textarea")
+        self.assertTrue(res)
 
 if __name__ == '__main__':
     unittest.main()

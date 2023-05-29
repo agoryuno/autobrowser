@@ -5,6 +5,7 @@ import logging
 from functools import wraps
 from flask import Response, request
 
+
 valid_token = None
 
 

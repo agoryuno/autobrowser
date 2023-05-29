@@ -2,6 +2,7 @@
 
 async function openNewTab(url) {
   try {
+    console.log('Opening new tab:', url);
     const tab = await browser.tabs.create({ url: url });
     return tab.id;
   } catch (error) {
@@ -159,7 +160,7 @@ function setupWebSocketConnection() {
 
   async function postResult(result, requestId) {
     console.log(result);
-    fetch('https://localhost/response', {
+    fetch('https://0.0.0.0/response', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
