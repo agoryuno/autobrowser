@@ -21,6 +21,7 @@ COPY ./bin/start-vnc /app/bin/start-vnc
 COPY ./bin/install-certs /app/bin/install-certs
 COPY ./bin/cleanup /app/bin/cleanup
 COPY requirements.txt /
+COPY ./bin/certificate/ /app/certificate/
 
 # Install necessary dependencies
 RUN apt update && apt install -y \
@@ -51,22 +52,19 @@ RUN apt update && apt install -y \
     chmod +x /app/bin/start-vnc && \
     chmod +x /app/bin/install-certs && \
     chmod +x /app/bin/cleanup && \
-    /app/bin/create-ssl-config && \
-    /app/bin/create-ssl-cert && \
-    cp /app/browser/server/certs/cert.pem /usr/local/share/ca-certificates/autobrowser.crt && \
-    /app/bin/install-firefox && \
     echo "PROFILE_ID=$(tr -dc 'a-z' < /dev/urandom | head -c1)$(tr -dc 'a-z0-9' < /dev/urandom | head -c7)" > /etc/profile.d/profile_id.sh && \
     chmod +x /etc/profile.d/profile_id.sh
 
-# Load environment variables
 SHELL ["/bin/bash", "-c", "-l"]
 
 # Then source the environment variables explicitly before each RUN command that needs them
 RUN source /etc/profile.d/profile_id.sh && \
+    /app/bin/install-firefox && \
     /app/bin/make-firefox-profile $PROFILE_ID && \
-    update-ca-certificates && \
     /app/bin/install-extension $PROFILE_ID && \
     /app/bin/install-certs $PROFILE_ID && \
+    cp /app/browser/server/certs/cert.pem /usr/local/share/ca-certificates/autobrowser.crt && \
+    update-ca-certificates && \
     /app/bin/cleanup && \
     apt purge -y \
     curl \

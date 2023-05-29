@@ -33,7 +33,6 @@ done
 base_dir=$(dirname $(dirname $(realpath "$0")))
 config_file=$(realpath "$base_dir/$config_file")
 
-
 # Read the application mode from config.ini
 mode=$(grep "^MODE=" "$config_file" | awk -F "=" '{print $2}')
 

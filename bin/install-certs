@@ -4,7 +4,22 @@
 
 echo "Executing install-certs"
 
+base_dir=$(dirname $(dirname $(realpath "$0")))
+
+# Check if cert.pem and key.pem exist
+if [[ -f "$base_dir/certificate/cert.pem" && -f "$base_dir/certificate/key.pem" ]]; then
+  # If they do, copy them to the destination directory
+  echo "install-certs: found certificate files"
+  cp "$base_dir/certificate/cert.pem" "$base_dir/browser/server/certs/"
+  cp "$base_dir/certificate/key.pem" "$base_dir/browser/server/certs/"
+else
+  echo "install-certs: certificate files not found - creating.."
+  # If not, execute the create-ssl-config and create-ssl-cert scripts
+  $base_dir/bin/create-ssl-config
+  $base_dir/bin/create-ssl-cert
+fi
+
 prof_id=$1
 
-certutil -A -n "Autobrowser Certificate" -t "TC,C,T" -i /app/browser/server/certs/cert.pem -d "sql:/root/.mozilla/firefox/${prof_id}.default"
-certutil -V -d /root/.mozilla/firefox/${prof_id}.default -n "Autobrowser Certificate" -u V
+certutil -A -n "Autobrowser Certificate" -t "TC,C,T" -i "/app/browser/server/certs/cert.pem" -d "sql:/root/.mozilla/firefox/${prof_id}.default"
+certutil -V -d "/root/.mozilla/firefox/${prof_id}.default" -n "Autobrowser Certificate" -u V
