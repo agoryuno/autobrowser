@@ -253,7 +253,7 @@ class TestAddFunction(unittest.TestCase):
                               """const a = 1;
                               a = 2;
                               """)
-        print (res)
+        self.assertEqual(res, "TypeError: invalid assignment to const 'a'")
 
 if __name__ == '__main__':
     unittest.main()
