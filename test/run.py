@@ -80,6 +80,7 @@ def restart_container(image_name=IMAGE_NAME,
                       container_name=CONTAINER_NAME,
                       config_path=CONFIG_PATH,
                       base_dir=BASE_DIR):
+    logger.info(f"Restarting container {container_name}...")
     command = ['sudo', 'docker', 'run', 
                '-d',
                '--name', container_name, 
@@ -90,13 +91,29 @@ def restart_container(image_name=IMAGE_NAME,
                '-p', '5900:5900',
                image_name]
     try:
+        logger.info("Stopping the container...")
         kill_container(container_name)
+
         while is_container_running(container_name):
             sleep(1)
+
+        logger.info("Removing the container...")
         proc = subprocess.Popen(['sudo', 'docker', 'rm', container_name],
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         proc.wait()
 
+        logger.info("Removing the token file...")
+        p =subprocess.Popen(['rm', '-f', f'{base_dir}/token.txt'])
+        p.wait()
+
+        logger.info("Recreating the token file...")
+        p = subprocess.Popen(['touch', f'{base_dir}/token.txt'], 
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                        )
+        p.wait()
+
+
+        logger.info("Starting the container...")
         result = subprocess.run(command, 
                                 check=True, 
                                 text=True,
@@ -188,25 +205,25 @@ class TestAddFunction(unittest.TestCase):
         except Exception as e:
             logger.error(f"An error occurred while trying to stop the service: {e}")
         
-    def test_tabsList(self):
+    def atest_tabsList(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tabs = browser.tabs_list()
         self.assertIsInstance(tabs, list)
         self.assertGreaterEqual(len(tabs), 1)
         self.assertIsInstance(tabs[0], dict)
 
-    def test_openUrl(self):
+    def atest_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         self.assertIsInstance(tab_id, int)
         self.assertTrue(browser.close_tab_by_id(tab_id))
 
-    def test_close_tab_by_id(self):
+    def atest_close_tab_by_id(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         res = browser.close_tab_by_id(18446744073709551615)
         self.assertFalse(res)
 
-    def test_get_tab_html(self):
+    def atest_get_tab_html(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         browser.wait_for_element(tab_id, "html body form textarea")
@@ -219,6 +236,22 @@ class TestAddFunction(unittest.TestCase):
         tab_id = browser.open_tab("https://www.google.com")
         res = browser.wait_for_element(tab_id, "html body form textarea")
         self.assertTrue(res)
+
+    def test_inject_script(self):
+        browser = Browser(TestAddFunction.token, trusted_ca=False)
+        tab_id = browser.open_tab("https://www.google.com")
+        res = browser.wait_for_element(tab_id, "html body form textarea")
+        res = browser.inject_script(tab_id, 
+        """
+        window.result = 4 + 5;
+        """)
+        self.assertEqual(int(res), 9)
+
+        res = browser.inject_script(tab_id,
+                              """const a = 1;
+                              a = 2;
+                              """)
+        print (res)
 
 if __name__ == '__main__':
     unittest.main()

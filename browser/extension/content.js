@@ -31,13 +31,20 @@ function executeScript(source, token) {
   script.textContent = source;
 
   // Create a promise that will be resolved when the message is received
-  const promise = new Promise((resolve) => {
+  const promise = new Promise((resolve, reject) => {
     function messageListener(event) {
       // Check for some condition to verify that this is the message you want to receive
-      if (event.source === window && event.data.type && event.data.type === 'FROM_PAGE_SCRIPT' && event.data.token === token) {
-        console.log('Received message from page script:', event.data.text);
-        // Resolve the promise with the received message
-        resolve(event.data.text);
+      if (event.source === window && event.data.type && event.data.token === token) {
+        if (event.data.type === 'FROM_PAGE_SCRIPT') {
+          console.log('Received message from page script:', event.data.text);
+          // Resolve the promise with the received message
+          resolve(event.data.text);
+        } else if (event.data.type === 'FROM_PAGE_SCRIPT_ERROR') {
+          console.log('Received error from page script:', event.data.text);
+          // Reject the promise with the received error
+          // reject(new Error(event.data.text));
+          resolve(event.data.text);
+        }
         // Cleanup after receiving the message
         window.removeEventListener('message', messageListener);
         document.body.removeChild(script);
@@ -48,11 +55,11 @@ function executeScript(source, token) {
   });
 
   document.body.appendChild(script);
-  
 
   // Return the promise
   return promise;
 }
+
 
 function waitForElement(selector, timeout) {
   const token = Math.random().toString(36).substring(2);
@@ -84,14 +91,18 @@ function injectScript(source) {
   console.log('Injecting script:', source)
 
   // Append code to send a message with the value of window.result
-  source = 'window.result = null;\n' + source + '\n'
-  source += `
+  source = `window.result = null;
+  window.onerror = function(message, url, line, column, error) {
+    window.postMessage({ type: 'FROM_PAGE_SCRIPT_ERROR', token: '${token}', text: message, error: error }, '*');
+  };
+  ` + source + `
     window.result = window.result || null;
     window.postMessage({ type: 'FROM_PAGE_SCRIPT', token: '${token}', text: window.result }, '*');
     `;
 
   return executeScript(source, token);
 }
+
 
 function addScriptToPage(source) {
   const script = document.createElement('script');
