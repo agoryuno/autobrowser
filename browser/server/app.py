@@ -130,15 +130,19 @@ def close_tab_by_id():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'result': 'timeout'}, 408
+        return {'status': 'error', 'message': 'timeout'}, 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
     del results_by_id[request_id]
-    status = 'success' if result else 'error'
-    code = 200 if result else 400
 
-    return {'status': status, 'result': result}, code
+    if not result["result"]:
+        code = 500
+        if result["message"] == "InvalidTabId":
+            code = 400
+        return {'status': 'error', 'message': result["message"]}, code
+
+    return {'status': 'success', 'message': ''}, 200
 
 
 @app.route('/tabsList', methods=['GET'])
@@ -324,14 +328,13 @@ def handle_connect():
 @socketio.on('disconnect')
 @requires_login
 def handle_disconnect():
-    print('Client disconnected:', request.sid)
+    logger.debug(f'Client disconnected: {request.sid}')
     sock_status.connected = False
 
 @socketio.on('message')
 @requires_login
 def handle_message(data):
-    print('received message:')
-    print(data)
+    logger.debug(f'received message: {data}')
 
     request_id = data.get('request_id')
     if not request_id:
@@ -339,15 +342,15 @@ def handle_message(data):
 
     event = events_by_id.get(request_id)
     if event:
-        results_by_id[request_id] = data.get('result')
+        del data['request_id']
+        results_by_id[request_id] = data
         event.set()
 
 @app.route("/response", methods=['POST'])
 @requires_login
 def handle_response():
     data = request.get_json()
-    print ('received message over POST')
-    print (data)
+    logger.debug (f'received message over POST: {data}')
 
     request_id = data.get('request_id')
     if not request_id:
@@ -357,6 +360,7 @@ def handle_response():
         results_by_id[request_id] = data.get('result')
         event.set()
     return jsonify({'message': 'success'}), 200
+
 
 # Run the Flask app with optional host and port
 if __name__ == '__main__':

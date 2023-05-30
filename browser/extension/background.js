@@ -37,15 +37,22 @@ async function closeTabById(tabId) {
   try {
     const parsedTabId = parseInt(tabId, 10);
     if (isNaN(parsedTabId)) {
-      throw new Error('Invalid tab ID');
+      throw new Error('InvalidTabIdError');
     }
     await browser.tabs.remove(parsedTabId);
-    return true;
+    return {result: true, message: ''};
   } catch (error) {
     console.error(`Error closing tab by ID: ${error.message}`);
-    return false;
+
+    if (error.message === 'InvalidTabIdError') {
+      // Handle invalid tab ID error specifically
+      return {result: false, message: "InvalidTabIdError"};
+    }
+
+    return {result: false, message: error.message};
   }
 }
+
 
 async function getTabHTML(tabId) {
   try {
@@ -143,10 +150,17 @@ function setupWebSocketConnection() {
     socket.emit('message', { result: result, request_id: data['request_id'] });
   });
 
+
   socket.on('close_tab_by_id', async (data) => {
     const result = await closeTabById(data['tab_id']);
-    socket.emit('message', { result: result, request_id: data['request_id'] });
-  });
+    let message = '';
+    if (!result.result) {
+        message = result.message;
+    }
+    socket.emit('message', { result: result.result, 
+        message: message, request_id: data['request_id'] });
+});
+
 
   socket.on('open_new_tab', async (data) => {
     const result = await openNewTab(data['url']);
