@@ -130,13 +130,15 @@ def close_tab_by_id():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for closeTabById',
-                'error': 'timeout'}, 408
+        return {'status': 'error', 'result': 'timeout'}, 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
     del results_by_id[request_id]
-    return {'status': 'success' if result else 'error', 'result': result}
+    status = 'success' if result else 'error'
+    code = 200 if result else 400
+
+    return {'status': status, 'result': result}, code
 
 
 @app.route('/tabsList', methods=['GET'])

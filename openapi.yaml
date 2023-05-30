@@ -1,0 +1,139 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  description: An API to control a Firefox browser instance
+  title: Autobrowser
+servers:
+  - url: https://localhost
+    description: Local server
+paths:
+  /closeTabById:
+    post:
+      summary: Close a tab by its ID. Tab IDs can be found in the /tabsList endpoint, they are also returned by the /openTab endpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                tab_id:
+                  type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+        '400':
+          description: Invalid tab ID
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: [error]
+                  message:
+                    type: string
+        '408':
+          description: Timeout error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: [error]
+                  result:
+                    type: string
+                    enum: [timeout]
+
+  /tabsList:
+    get:
+      summary: Get list of tabs
+      responses:
+        '200':
+          description: Success
+        '408':
+          description: Timeout error
+
+  /openTab:
+    post:
+      summary: Open a new tab
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                url:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '408':
+          description: Timeout error
+
+  /injectScript:
+    post:
+      summary: Inject a script
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                tab_id:
+                  type: string
+                code:
+                  type: string
+                timeout:
+                  type: integer
+      responses:
+        '200':
+          description: Success
+        '408':
+          description: Timeout error
+
+  /waitForElement:
+    post:
+      summary: Wait for an element
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                tab_id:
+                  type: string
+                selector:
+                  type: string
+                timeout:
+                  type: integer
+      responses:
+        '200':
+          description: Success
+        '408':
+          description: Timeout error
+
+  /getTabHTML/{tab_id}:
+    get:
+      summary: Get HTML of a tab
+      parameters:
+        - name: tab_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '408':
+          description: Timeout error
+
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Success
