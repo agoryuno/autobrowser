@@ -120,12 +120,13 @@ def restart_container(image_name=IMAGE_NAME,
                                 stdout=subprocess.PIPE, 
                                 stderr=subprocess.PIPE)
 
-        logger.info (f"Started the container: {result.stdout=}, {result.stderr=}")
+        logger.info (f"\033[32mStarted the container: {result.stdout=}, {result.stderr=}\033[0m")
         start_ts = time.time()
         while not is_container_running(container_name):
             sleep(1)
             if time.time() - start_ts > START_TIMEOUT:
                 raise TimeoutError("Timed out while waiting for the container to start")
+        logger.info("Container is running.")
     except subprocess.CalledProcessError as e:
         logger.error(f"Docker command failed: {e.stderr}")
         proc = subprocess.Popen(['sudo', 'docker', 'kill', container_name],
@@ -179,14 +180,15 @@ class TestAddFunction(unittest.TestCase):
         logger.debug (f"Test:: Using token: {cls.token}")
 
         try:
+            logger.debug("Test:: Starting the service...")
             browser = Browser(cls.token, trusted_ca=False)
             res = browser.tabs_list()
             while not res:
                 sleep(1)
+                logger.debug("\033[35mTest:: Retrying browser.tabs_list()...\033[0m")
                 res = browser.tabs_list()
             logger.debug (f"Test:: browser.tabs_list(): {res}")
-
-            logger.debug ("Test:: Service is ready")
+            logger.debug ("\033[32mTest:: Service is ready\033[0m")
         except Exception as e:
             logger.error(f"Test:: An error occurred while trying to connect to the service: {e}")
             kill_container()
@@ -205,25 +207,25 @@ class TestAddFunction(unittest.TestCase):
         except Exception as e:
             logger.error(f"An error occurred while trying to stop the service: {e}")
         
-    def atest_tabsList(self):
+    def test_tabsList(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tabs = browser.tabs_list()
         self.assertIsInstance(tabs, list)
         self.assertGreaterEqual(len(tabs), 1)
         self.assertIsInstance(tabs[0], dict)
 
-    def atest_openUrl(self):
+    def test_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         self.assertIsInstance(tab_id, int)
         self.assertTrue(browser.close_tab_by_id(tab_id))
 
-    def atest_close_tab_by_id(self):
+    def test_close_tab_by_id(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         res = browser.close_tab_by_id(18446744073709551615)
         self.assertFalse(res)
 
-    def atest_get_tab_html(self):
+    def test_get_tab_html(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         browser.wait_for_element(tab_id, "html body form textarea")
@@ -231,7 +233,7 @@ class TestAddFunction(unittest.TestCase):
         self.assertIsInstance(html, str)
         self.assertTrue(is_valid_html(html))
 
-    def atest_wait_for_element(self):
+    def test_wait_for_element(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         res = browser.wait_for_element(tab_id, "html body form textarea")

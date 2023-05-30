@@ -9,7 +9,6 @@ from aiohttp import TCPConnector
 
 import requests
 from requests.adapters import HTTPAdapter
-#from requests.packages.urllib3.util.retry import Retry
 from urllib3.util.retry import Retry
 
 from ._browser_protocol import BrowserProtocol
@@ -52,8 +51,6 @@ class Browser(BrowserProtocol):
         
         # Add the token to the URL
         url += f'?token={quote(self.token)}'
-
-        print ("using url: ", url)
 
         response = self.session.request(method, url, **kwargs)
         if response.status_code == 401:
