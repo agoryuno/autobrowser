@@ -10,13 +10,18 @@ Ultimately meant as a browser for LLMs.
 
 To install this service you need to have Docker installed.
 
-Clone the repository:
+1. Clone the repository:
 
 ```bash
 git clone https://github.com/agoryuno/autobrowser.git
 ```
 
-Inside the project directory execute:
+2. Copy the 'base-config.ini' file and rename the copy to 'config.ini'. Inside the file,
+in the "FIREFOX" section, fill in the value of the "VNC_PASS" setting. This will be the 
+password for the VNC instance and it should be at most 8 characters long and contain only
+alphanumerics
+
+3. Inside the project directory execute:
 
 ```bash
 ./build-service
