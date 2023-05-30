@@ -75,6 +75,9 @@ class BrowserProtocol(ABC):
                 **kwargs) -> dict:
         ...
 
+    @abstractmethod
+    def is_ready(self) -> bool:
+        ...
 
 class BrowserAsyncProtocol(BrowserProtocol, ABC):
     @abstractmethod

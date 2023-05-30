@@ -121,6 +121,10 @@ class Browser(BrowserProtocol):
             return result['result']
         return result
 
+    def is_ready(self):
+        result = self.request("GET", f"{self.base_url}/health")
+        return result["status"] == "success"
+
     def close(self):
         self.session.close()
 

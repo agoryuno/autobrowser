@@ -182,12 +182,12 @@ class TestAddFunction(unittest.TestCase):
         try:
             logger.debug("Test:: Starting the service...")
             browser = Browser(cls.token, trusted_ca=False)
-            res = browser.tabs_list()
+            res = browser.is_ready()
+            #res = browser.tabs_list()
             while not res:
                 sleep(1)
                 logger.debug("\033[35mTest:: Retrying browser.tabs_list()...\033[0m")
-                res = browser.tabs_list()
-            logger.debug (f"Test:: browser.tabs_list(): {res}")
+                res = browser.is_ready()
             logger.debug ("\033[32mTest:: Service is ready\033[0m")
         except Exception as e:
             logger.error(f"Test:: An error occurred while trying to connect to the service: {e}")

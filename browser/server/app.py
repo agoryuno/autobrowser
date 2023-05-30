@@ -20,6 +20,9 @@ from utils import read_token_from_file
 from utils import require_valid_token
 from auth import auth_blueprint, requires_login
 from utils import setup_logger
+from socket_manager import SocketManager
+
+sock_status = SocketManager()
 
 logger = setup_logger('/app/flask-log.txt')
 
@@ -61,6 +64,8 @@ socketio = SocketIO(app,
                     cors_allowed_origins="*", 
                     async_mode='gevent',
                     )
+
+connected_sockets = set()
 
 # Define HTML content
 html_content = '''
@@ -300,18 +305,25 @@ def get_tab_html(tab_id):
     del results_by_id[request_id]
     return {'status': 'success' if result else 'error', 'result': result}
 
+@app.route('/health', methods=['GET'])
+@require_valid_token
+def health():
+    if sock_status.connected:
+        return {'status': 'success', 'message': "The service is up and running."}
+    return {'status': 'error', 'message': "The service is not connected to the browser."}
 
 @socketio.on('connect')
 @requires_login
 def handle_connect():
     logger.debug('Client connected: %s', request.sid)
-    print('Client connected:', request.sid)
+    sock_status.connected = True
 
 
 @socketio.on('disconnect')
 @requires_login
 def handle_disconnect():
     print('Client disconnected:', request.sid)
+    sock_status.connected = False
 
 @socketio.on('message')
 @requires_login
