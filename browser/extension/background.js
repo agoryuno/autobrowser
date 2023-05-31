@@ -4,10 +4,10 @@ async function openNewTab(url) {
   try {
     console.log('Opening new tab:', url);
     const tab = await browser.tabs.create({ url: url });
-    return tab.id;
+    return {result: tab.id, message: ''};
   } catch (error) {
     console.error('Error opening new tab:', error);
-    return false;
+    return {result: false, message: error.message};
   }
 }
 

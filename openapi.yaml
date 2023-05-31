@@ -16,7 +16,7 @@ paths:
             schema:
               properties:
                 tab_id:
-                  type: string
+                  type: integer
       responses:
         '200':
           description: OK
@@ -75,9 +75,49 @@ paths:
                   type: string
       responses:
         '200':
-          description: Success
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['success']
+                  message:
+                    type: string
+                  result:
+                    type: integer
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                  result:
+                    type: boolean
+                    enum: [false]
+                  
         '408':
           description: Timeout error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                    enum: ['Timeout waiting for openTab']
+                  error:
+                    type: string
+                    enum: ['timeout']
+
 
   /injectScript:
     post:

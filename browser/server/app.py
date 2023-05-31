@@ -189,7 +189,13 @@ def open_tab():
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
     del results_by_id[request_id]
-    return {'status': 'success' if result else 'error', 'result': result}
+    del result[request_id]
+    code = 200
+    if not result["result"]:
+        code = 400
+    return {'status': 'success' if result['result'] else 'error', 
+            'result': result['result'],
+            'message': result['message'] if not result['result'] else 'OK'}, code
 
 
 @app.route('/injectScript', methods=['POST'])

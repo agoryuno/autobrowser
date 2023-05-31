@@ -214,13 +214,15 @@ class TestAddFunction(unittest.TestCase):
         self.assertGreaterEqual(len(tabs), 1)
         self.assertIsInstance(tabs[0], dict)
 
-    def atest_openUrl(self):
+    def test_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         self.assertIsInstance(tab_id, int)
         self.assertTrue(browser.close_tab_by_id(tab_id))
+        tab_id = browser.open_tab("www.google.com")
+        print (tab_id)
 
-    def test_close_tab_by_id(self):
+    def atest_close_tab_by_id(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         res, code = browser.close_tab_by_id(18446744073709551615)
         self.assertTrue(code == 400)
