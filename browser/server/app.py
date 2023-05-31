@@ -137,10 +137,7 @@ def close_tab_by_id():
     del results_by_id[request_id]
 
     if not result["result"]:
-        code = 500
-        if result["message"] == "InvalidTabId":
-            code = 400
-        return {'status': 'error', 'message': result["message"]}, code
+        return {'status': 'error', 'message': result["message"]}, 400
 
     return {'status': 'success', 'message': ''}, 200
 
@@ -345,6 +342,7 @@ def handle_message(data):
         del data['request_id']
         results_by_id[request_id] = data
         event.set()
+
 
 @app.route("/response", methods=['POST'])
 @requires_login

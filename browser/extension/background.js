@@ -44,10 +44,10 @@ async function closeTabById(tabId) {
   } catch (error) {
     console.error(`Error closing tab by ID: ${error.message}`);
 
-    if (error.message === 'InvalidTabIdError') {
+    //if (error.message.startsWith('Invalid tab ID:')) {
       // Handle invalid tab ID error specifically
-      return {result: false, message: "InvalidTabIdError"};
-    }
+    //  return {result: false, message: "InvalidTabIdError"};
+    //}
 
     return {result: false, message: error.message};
   }

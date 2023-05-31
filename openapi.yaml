@@ -30,19 +30,6 @@ paths:
                   message:
                     type: string
                     enum: ['OK']
-
-        '400':
-          description: Invalid tab ID
-          content:
-            application/json:
-              schema:
-                properties:
-                  status:
-                    type: string
-                    enum: ['error']
-                  message:
-                    type: string
-                    enum: ['InvalidTabId']
         '408':
           description: Timeout error
           content:
@@ -55,7 +42,7 @@ paths:
                   mesage:
                     type: string
                     enum: ['timeout']
-        '500':
+        '400':
           description: Unknown server error - see message for details
           content:
             application/json:

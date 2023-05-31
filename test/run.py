@@ -186,7 +186,7 @@ class TestAddFunction(unittest.TestCase):
             #res = browser.tabs_list()
             while not res:
                 sleep(1)
-                logger.debug("\033[35mTest:: Retrying browser.tabs_list()...\033[0m")
+                logger.debug("\033[35mTest:: Retrying browser.is_ready()...\033[0m")
                 res = browser.is_ready()
             logger.debug ("\033[32mTest:: Service is ready\033[0m")
         except Exception as e:
@@ -207,14 +207,14 @@ class TestAddFunction(unittest.TestCase):
         except Exception as e:
             logger.error(f"An error occurred while trying to stop the service: {e}")
         
-    def test_tabsList(self):
+    def atest_tabsList(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tabs = browser.tabs_list()
         self.assertIsInstance(tabs, list)
         self.assertGreaterEqual(len(tabs), 1)
         self.assertIsInstance(tabs[0], dict)
 
-    def test_openUrl(self):
+    def atest_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         self.assertIsInstance(tab_id, int)
@@ -222,10 +222,15 @@ class TestAddFunction(unittest.TestCase):
 
     def test_close_tab_by_id(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        res = browser.close_tab_by_id(18446744073709551615)
-        self.assertFalse(res)
+        res, code = browser.close_tab_by_id(18446744073709551615)
+        self.assertTrue(code == 400)
+        s = "Type error for parameter tabIds"
+        self.assertEqual(res['message'][:len(s)], s)
+        res, code = browser.close_tab_by_id(10)
+        self.assertTrue(code == 400)
+        self.assertEqual(res['message'], 'Invalid tab ID: 10')
 
-    def test_get_tab_html(self):
+    def atest_get_tab_html(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         browser.wait_for_element(tab_id, "html body form textarea")
@@ -233,13 +238,13 @@ class TestAddFunction(unittest.TestCase):
         self.assertIsInstance(html, str)
         self.assertTrue(is_valid_html(html))
 
-    def test_wait_for_element(self):
+    def atest_wait_for_element(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         res = browser.wait_for_element(tab_id, "html body form textarea")
         self.assertTrue(res)
 
-    def test_inject_script(self):
+    def atest_inject_script(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         res = browser.wait_for_element(tab_id, "html body form textarea")

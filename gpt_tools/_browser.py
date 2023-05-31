@@ -56,23 +56,22 @@ class Browser(BrowserProtocol):
         if response.status_code == 401:
             raise ValueError("Unauthorized Access. Please check your token.")
         try:
-            return response.json()
+            return response.json(), response.status_code
         except ValueError as e:
             raise ValueError(f"Error parsing JSON: {e}")
     
     def close_tab_by_id(self, 
                         tab_id: int) -> bool:
-        result = self.request("POST", f"{self.base_url}/closeTabById", json={"tab_id": tab_id})
-        return result["status"] == "success"
+        return self.request("POST", f"{self.base_url}/closeTabById", json={"tab_id": tab_id})
 
     def tabs_list(self) -> Optional[dict]:
-        result = self.request("GET", f"{self.base_url}/tabsList")
+        result, _ = self.request("GET", f"{self.base_url}/tabsList")
         if result["status"] == "success":
             return result['tabs']
         print ("tabs_list() result: ", result)
 
     def open_tab(self, url: str) -> Union[int, Literal[False]]:
-        result = self.request("POST", f"{self.base_url}/openTab", json={"url": url})
+        result, _ = self.request("POST", f"{self.base_url}/openTab", json={"url": url})
         if result["status"] == "success":
             return result['result']
         return False
@@ -93,7 +92,7 @@ class Browser(BrowserProtocol):
         The code can return an arbitrary object by assigning it to the
         `window.result` variable.
         """
-        result = self.request("POST",
+        result, _ = self.request("POST",
                             f"{self.base_url}/injectScript",
                             json={"tab_id": tab_id, "code": code})
         if result["status"] == "success":
@@ -105,7 +104,7 @@ class Browser(BrowserProtocol):
         if timeout:
             data["timeout"] = timeout
         print ("browser.wait_for_element called with args: ", data)
-        result = self.request("POST",
+        result, _ = self.request("POST",
                             f"{self.base_url}/waitForElement",
                             json=data)
         if result["status"] == "success":
@@ -116,13 +115,13 @@ class Browser(BrowserProtocol):
         return False
 
     def get_tab_html(self, tab_id: int) -> Union[str, dict]:
-        result = self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}")
+        result, _ = self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}")
         if result["status"] == "success":
             return result['result']
         return result
 
     def is_ready(self):
-        result = self.request("GET", f"{self.base_url}/health")
+        result, _ = self.request("GET", f"{self.base_url}/health")
         return result["status"] == "success"
 
     def close(self):

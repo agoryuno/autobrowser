@@ -35,3 +35,5 @@ fi
 mkdir -p .temp
 
 docker build --build-arg CACHE=$CACHE -t $IMAGE_NAME .
+
+rm -f openssl.config

@@ -5,3 +5,4 @@
 rm -rf /app/.temp/
 #rm -rf /app/browser/extension/ 
 rm -f /app/bin/default-profile.tar.xz
+rm -f /app/bin/openssl.config
