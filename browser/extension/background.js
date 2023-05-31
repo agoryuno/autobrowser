@@ -164,7 +164,9 @@ function setupWebSocketConnection() {
 
   socket.on('open_new_tab', async (data) => {
     const result = await openNewTab(data['url']);
-    socket.emit('message', { result: result, request_id: data['request_id'] });
+    socket.emit('message', { result: result['result'], 
+        message: result['message'], 
+        request_id: data['request_id'] });
   });
 
   socket.on('execute_script', async (data) => {

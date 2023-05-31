@@ -61,7 +61,7 @@ class Browser(BrowserProtocol):
             raise ValueError(f"Error parsing JSON: {e}")
     
     def close_tab_by_id(self, 
-                        tab_id: int) -> bool:
+                        tab_id: int):
         return self.request("POST", f"{self.base_url}/closeTabById", json={"tab_id": tab_id})
 
     def tabs_list(self) -> Optional[dict]:
@@ -70,11 +70,8 @@ class Browser(BrowserProtocol):
             return result['tabs']
         print ("tabs_list() result: ", result)
 
-    def open_tab(self, url: str) -> Union[int, Literal[False]]:
-        result, _ = self.request("POST", f"{self.base_url}/openTab", json={"url": url})
-        if result["status"] == "success":
-            return result['result']
-        return False
+    def open_tab(self, url: str):
+        return self.request("POST", f"{self.base_url}/openTab", json={"url": url})
 
     def execute_script(self, 
                        tab_id: int, 

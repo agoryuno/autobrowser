@@ -177,19 +177,21 @@ def open_tab():
 
     socketio.emit('open_new_tab', {'url': _url, 'request_id': request_id})
 
-    print ("open_tab: emitted open_new_tab event")
+    logger.debug ("open_tab: emitted open_new_tab event")
     try:
         with Timeout(TIMEOUT):
             event.wait()
     except Timeout:
         del events_by_id[request_id]
+        if request_id in results_by_id:
+            del results_by_id[request_id]
         return {'status': 'error', 'message': 'Timeout waiting for openTab',
                 'error': 'timeout'}, 408
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
     del results_by_id[request_id]
-    del result[request_id]
+    logger.debug(f"open_tab: {result=}")
     code = 200
     if not result["result"]:
         code = 400

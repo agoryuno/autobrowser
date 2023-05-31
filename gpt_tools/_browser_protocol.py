@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Literal, Optional, Any, Protocol, Coroutine
+from typing import Literal, Optional, Any, Protocol, Coroutine, Tuple
 import aiohttp
 
+APIReturnValue = Tuple[dict, Literal[200, 400, 408, 500]]
 
 class SessionProtocol(Protocol):
     def request(self, method: Literal["POST", "GET"], url: str, **kwargs) -> Any:
@@ -30,7 +31,7 @@ class BrowserProtocol(ABC):
 
     @abstractmethod
     def close_tab_by_id(self, 
-                        tab_id: int) -> bool:
+                        tab_id: int) -> APIReturnValue:
         ...
 
     @abstractmethod
@@ -38,7 +39,7 @@ class BrowserProtocol(ABC):
         ...
 
     @abstractmethod
-    def open_tab(self, url: str) -> int:
+    def open_tab(self, url: str) -> APIReturnValue:
         ...
 
     @abstractmethod

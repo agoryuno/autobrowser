@@ -216,13 +216,13 @@ class TestAddFunction(unittest.TestCase):
 
     def test_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        tab_id = browser.open_tab("https://www.google.com")
-        self.assertIsInstance(tab_id, int)
-        self.assertTrue(browser.close_tab_by_id(tab_id))
-        tab_id = browser.open_tab("www.google.com")
-        print (tab_id)
+        result, code = browser.open_tab("https://www.google.com")
+        self.assertEqual(code, 200)
+        self.assertIsInstance(result["result"], int)
+        result, code = browser.close_tab_by_id(result["result"])
+        self.assertEqual(code, 200)
 
-    def atest_close_tab_by_id(self):
+    def test_close_tab_by_id(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         res, code = browser.close_tab_by_id(18446744073709551615)
         self.assertTrue(code == 400)
