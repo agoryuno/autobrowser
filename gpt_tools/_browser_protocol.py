@@ -35,7 +35,7 @@ class BrowserProtocol(ABC):
         ...
 
     @abstractmethod
-    def tabs_list(self) -> Optional[dict]:
+    def tabs_list(self) -> APIReturnValue:
         ...
 
     @abstractmethod

@@ -158,13 +158,17 @@ def get_tabs():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for tabs list',
-                'error': 'timeout'}, 408
+        return {'status': 'error', 'message': 'Timeout waiting for tabsList',
+                'result': 'timeout'}, 408
 
     tabs = results_by_id.get(request_id)
     del events_by_id[request_id]
     del results_by_id[request_id]
-    return {'status': 'success', 'tabs': tabs}
+    if tabs['result']:
+        return {'status': 'success', 'result': [tab for tab in tabs['result']],
+            'message': 'OK'}, 200
+    return {'status': 'error', 'message': tabs['message'], 'result': False}, 400
+
 
 
 @app.route('/openTab', methods=['POST'])
@@ -186,7 +190,7 @@ def open_tab():
         if request_id in results_by_id:
             del results_by_id[request_id]
         return {'status': 'error', 'message': 'Timeout waiting for openTab',
-                'error': 'timeout'}, 408
+                'result': 'timeout'}, 408
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -242,7 +246,7 @@ def wait_for_element():
     request_id = str(uuid.uuid4())
     events_by_id[request_id] = event
 
-    print ('waitForElement route in app, calling browser: ', tab_id, selector, timeout, request_id)
+    logger.debug ('waitForElement route in app, calling browser: ', tab_id, selector, timeout, request_id)
     socketio.emit('wait_for_element', {
         'tab_id': tab_id,
         'selector': selector,
@@ -256,12 +260,17 @@ def wait_for_element():
     except Timeout:
         del events_by_id[request_id]
         return {'status': 'error', 'message': 'Timeout waiting for waitForElement',
-                'error': 'timeout'}, 408
+                'result': 'timeout'}, 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
     del results_by_id[request_id]
-    return {'status': 'success' if result else 'error', 'result': result}
+    code = 200
+    if result['result'] == 'error':
+        code = 400
+    return {'status': result['result'], 
+            'result': result['result'] == 'success',
+            'message': 'OK' if result['result'] == 'success' else result['message']}, code
 
 
 @app.route('/executeScript', methods=['POST'])

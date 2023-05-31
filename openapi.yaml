@@ -59,9 +59,57 @@ paths:
       summary: Get list of tabs
       responses:
         '200':
-          description: Success
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['success']
+                  message: 
+                    type: string
+                    enum: ['OK']
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        url:
+                          type: string
+                        title:
+                          type: string
         '408':
           description: Timeout error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                    enum: ['Timeout waiting for tabsList']
+                  result:
+                    type: string
+                    enum: ['timeout']
+        '400'
+          description: Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                  result:
+                    type: boolean
+                    enum: [false]
 
   /openTab:
     post:
@@ -114,7 +162,7 @@ paths:
                   message:
                     type: string
                     enum: ['Timeout waiting for openTab']
-                  error:
+                  result:
                     type: string
                     enum: ['timeout']
 
@@ -141,23 +189,65 @@ paths:
 
   /waitForElement:
     post:
-      summary: Wait for an element
+      summary: Wait for an element to become available in the page's DOM
       requestBody:
         content:
           application/json:
             schema:
               properties:
                 tab_id:
-                  type: string
+                  type: integer
                 selector:
+                  description: This is a CSS Path selector that can be used with document.querySelector()
                   type: string
                 timeout:
+                  description: Amount of time (in seconds) to wait for the element to become available
                   type: integer
+                  default: 60
       responses:
         '200':
-          description: Success
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['success']
+                  message:
+                    type: string
+                  result:
+                    type: boolean
+                    enum: [true]
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                  result:
+                    type: boolean
+                    enum: [false]
         '408':
           description: Timeout error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                    enum: ['Timeout waiting for waitForElement']
+                  result:
+                    type: string
+                    enum: ['timeout']
 
   /getTabHTML/{tab_id}:
     get:

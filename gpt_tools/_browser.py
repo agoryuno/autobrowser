@@ -65,10 +65,7 @@ class Browser(BrowserProtocol):
         return self.request("POST", f"{self.base_url}/closeTabById", json={"tab_id": tab_id})
 
     def tabs_list(self) -> Optional[dict]:
-        result, _ = self.request("GET", f"{self.base_url}/tabsList")
-        if result["status"] == "success":
-            return result['tabs']
-        print ("tabs_list() result: ", result)
+        return self.request("GET", f"{self.base_url}/tabsList")
 
     def open_tab(self, url: str):
         return self.request("POST", f"{self.base_url}/openTab", json={"url": url})
@@ -101,15 +98,10 @@ class Browser(BrowserProtocol):
         if timeout:
             data["timeout"] = timeout
         print ("browser.wait_for_element called with args: ", data)
-        result, _ = self.request("POST",
+        return self.request("POST",
                             f"{self.base_url}/waitForElement",
                             json=data)
-        if result["status"] == "success":
-            return True
-        elif result["status"] == "error":
-            if result.get('error') == 'timeout':
-                raise TimeoutError(f"Timeout waiting for element {selector} in tab {tab_id}")
-        return False
+        
 
     def get_tab_html(self, tab_id: int) -> Union[str, dict]:
         result, _ = self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}")

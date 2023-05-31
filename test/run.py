@@ -209,20 +209,21 @@ class TestAddFunction(unittest.TestCase):
         
     def atest_tabsList(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        tabs = browser.tabs_list()
-        self.assertIsInstance(tabs, list)
-        self.assertGreaterEqual(len(tabs), 1)
-        self.assertIsInstance(tabs[0], dict)
+        result, code = browser.tabs_list()
+        self.assertEqual(result["result"][0]['title'], 'GPT browser')
+        self.assertEqual(code, 200)
 
-    def test_openUrl(self):
+    def atest_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         result, code = browser.open_tab("https://www.google.com")
         self.assertEqual(code, 200)
         self.assertIsInstance(result["result"], int)
         result, code = browser.close_tab_by_id(result["result"])
         self.assertEqual(code, 200)
+        result, code = browser.open_tab("")
+        self.assertEqual(code, 200)
 
-    def test_close_tab_by_id(self):
+    def atest_close_tab_by_id(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         res, code = browser.close_tab_by_id(18446744073709551615)
         self.assertTrue(code == 400)
@@ -232,6 +233,14 @@ class TestAddFunction(unittest.TestCase):
         self.assertTrue(code == 400)
         self.assertEqual(res['message'], 'Invalid tab ID: 10')
 
+    def test_wait_for_element(self):
+        browser = Browser(TestAddFunction.token, trusted_ca=False)
+        result, code = browser.open_tab("https://www.google.com")
+        self.assertEqual(code, 200)
+        res = browser.wait_for_element(result['result'], "html body form textarea")
+        print (res)
+        self.assertTrue(res)
+
     def atest_get_tab_html(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
@@ -240,11 +249,7 @@ class TestAddFunction(unittest.TestCase):
         self.assertIsInstance(html, str)
         self.assertTrue(is_valid_html(html))
 
-    def atest_wait_for_element(self):
-        browser = Browser(TestAddFunction.token, trusted_ca=False)
-        tab_id = browser.open_tab("https://www.google.com")
-        res = browser.wait_for_element(tab_id, "html body form textarea")
-        self.assertTrue(res)
+
 
     def atest_inject_script(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)

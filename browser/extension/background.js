@@ -12,12 +12,15 @@ async function openNewTab(url) {
 }
 
 function listTabs() {
-  return browser.tabs.query({}).then((tabs) => {
-    const tabList = tabs.map((tab) => ({ id: tab.id, 
-                                         url: tab.url,
-                                         title: tab.title }));
-    return tabList;
-  });
+  return browser.tabs.query({})
+    .then((tabs) => {
+      const tabList = tabs.map((tab) => ({
+        id: tab.id, 
+        url: tab.url,
+        title: tab.title 
+      }));
+      return tabList;
+    })
 }
 
 async function closeTabByUrl(url) {
@@ -89,7 +92,7 @@ function sendMessage(tabId, selector, timeout) {
           { action: 'waitForElement', selector: selector, timeout: timeout }
         );
         console.log("waitForElement_bg result: " + result);
-        resolve({'result': 'success', 'message': result});
+        resolve({'result': 'success', message: 'OK'});
       } catch (error) {
         let elapsedTime = Date.now() - startTime;
         
@@ -98,7 +101,7 @@ function sendMessage(tabId, selector, timeout) {
           setTimeout(retrySendMessage, 1000);  // Retry after 1 second
         } else {
           console.error('Error waiting for element in content script:', error);
-          reject({'result': 'error', 'message': error.toString()});
+          resolve({'result': 'error', 'message': error.message});
         }
       }
     }
@@ -141,8 +144,13 @@ function setupWebSocketConnection() {
 
   socket.on('tabs_list', async (data) => {
     console.log("tabs_list request received");
-    const tabList = await listTabs();
-    socket.emit('message', { result: tabList, request_id: data['request_id'] });
+    try {
+      const tabList = await listTabs();
+      socket.emit('message', { result: tabList, request_id: data['request_id'] });
+    } catch (error) {
+      console.error('Error listing tabs:', error);
+      socket.emit('message', { result: false, message: error.message, request_id: data['request_id'] });
+    }
   });
   
   socket.on('close_tab_by_url', async (data) => {
