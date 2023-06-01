@@ -92,32 +92,6 @@ def root():
     return Response(html_content, content_type='text/html')
 
 
-@app.route('/closeTabByUrl', methods=['POST'])
-@require_valid_token
-def close_tab_by_url():
-    _url = request.json['url']
-    event = Event()
-    request_id = str(uuid.uuid4())
-    events_by_id[request_id] = event
-
-    socketio.emit('close_tab_by_url', {'url': _url, 'request_id': request_id})
-
-    try:
-        with Timeout(TIMEOUT):
-            event.wait()
-    except Timeout:
-        del events_by_id[request_id]
-        if request_id in results_by_id:
-            del results_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for closeTabByUrl',
-                'error': 'timeout'}, 408
-
-    result = results_by_id.get(request_id)
-    del events_by_id[request_id]
-    del results_by_id[request_id]
-    return {'status': 'success' if result else 'error', 'result': result}
-
-
 @app.route('/closeTabById', methods=['POST'])
 @require_valid_token
 def close_tab_by_id():
@@ -176,7 +150,6 @@ def get_tabs():
     return {'status': 'error', 'message': tabs['message'], 'result': False}, 400
 
 
-
 @app.route('/openTab', methods=['POST'])
 @require_valid_token
 def open_tab():
@@ -232,13 +205,17 @@ def inject_script():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for openTab',
-                'error': 'timeout'}, 408
+        if request_id in results_by_id:
+            del results_by_id[request_id]
+        return timeout_response('injectScript'), 408
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
     del results_by_id[request_id]
-    return {'status': 'success' if result else 'error', 'result': result}
+    code = 200
+    if result['status'] == "error":
+        code = 400
+    return {'status': 'success' if result else 'error', 'result': result}, code
 
 
 @app.route('/waitForElement', methods=['POST'])
@@ -264,6 +241,8 @@ def wait_for_element():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
+        if request_id in results_by_id:
+            del results_by_id[request_id]
         return timeout_response('waitForElement'), 408
 
     result = results_by_id.get(request_id)

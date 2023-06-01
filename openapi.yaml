@@ -193,7 +193,7 @@ paths:
                     message:
                       type: string
                     result:
-                      type: integer
+                      type: string
           '400':
             description: Error - this signals an error with script injection, not an error caused by the execution of the injected script.
             content:
