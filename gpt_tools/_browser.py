@@ -116,13 +116,8 @@ class Browser(BrowserProtocol):
                                  f"{self.base_url}/waitForElement",
                                  json=data))
 
-        
-
     def get_tab_html(self, tab_id: int) -> Union[str, dict]:
-        result, _ = self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}")
-        if result["status"] == "success":
-            return result['result']
-        return result
+        return self._reply(self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}"))
 
     def is_ready(self):
         result, _ = self.request("GET", f"{self.base_url}/health")

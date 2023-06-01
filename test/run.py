@@ -208,15 +208,15 @@ class TestAddFunction(unittest.TestCase):
         except Exception as e:
             logger.error(f"An error occurred while trying to stop the service: {e}")
         
-    def atest_tabsList(self):
+    def test_tabsList(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tabs = browser.tabs_list()
         self.assertIsInstance(tabs, list)
         self.assertGreater(len(tabs), 0)
         self.assertIsInstance(tabs[0], dict)
-        self.assertIn(tabs[0], 'id')
-        self.assertIn(tabs[0], 'title')
-        self.assertIn(tabs[0], 'url')
+        self.assertIn('id', tabs[0])
+        self.assertIn('title', tabs[0])
+        self.assertIn('url', tabs[0])
 
     def test_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
@@ -253,10 +253,9 @@ class TestAddFunction(unittest.TestCase):
         tab_id = browser.wait_for_element(tab_id, "html body form textarea")
         self.assertIsInstance(tab_id, int)
 
-    def atest_get_tab_html(self):
+    def test_get_tab_html(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        result, code = browser.open_tab("https://www.google.com")
-        tab_id = result['result']
+        tab_id = browser.open_tab("https://www.google.com")
         browser.wait_for_element(tab_id, "html body form textarea")
         html = browser.get_tab_html(tab_id)
         print (html)

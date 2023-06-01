@@ -19,7 +19,7 @@ import utils
 from utils import read_token_from_file
 from utils import require_valid_token
 from auth import auth_blueprint, requires_login
-from utils import setup_logger
+from utils import setup_logger, timeout_response
 from socket_manager import SocketManager
 
 sock_status = SocketManager()
@@ -91,6 +91,7 @@ def root():
     # Return the HTML content as a response with a content type of 'text/html'
     return Response(html_content, content_type='text/html')
 
+
 @app.route('/closeTabByUrl', methods=['POST'])
 @require_valid_token
 def close_tab_by_url():
@@ -106,6 +107,8 @@ def close_tab_by_url():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
+        if request_id in results_by_id:
+            del results_by_id[request_id]
         return {'status': 'error', 'message': 'Timeout waiting for closeTabByUrl',
                 'error': 'timeout'}, 408
 
@@ -130,7 +133,9 @@ def close_tab_by_id():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'timeout'}, 408
+        if request_id in results_by_id:
+            del results_by_id[request_id]
+        return timeout_response('closeTabById'), 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -158,8 +163,9 @@ def get_tabs():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for tabsList',
-                'result': 'timeout'}, 408
+        if request_id in results_by_id:
+            del results_by_id[request_id]
+        return timeout_response('tabsList'), 408
 
     tabs = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -189,8 +195,7 @@ def open_tab():
         del events_by_id[request_id]
         if request_id in results_by_id:
             del results_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for openTab',
-                'result': 'timeout'}, 408
+        return timeout_response('openTab'), 408
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -259,8 +264,7 @@ def wait_for_element():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for waitForElement',
-                'result': 'timeout'}, 408
+        return timeout_response('waitForElement'), 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -294,8 +298,7 @@ def execute_script():
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for openTab',
-                'error': 'timeout'}, 408
+        return timeout_response('executeScript'), 408
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -317,8 +320,7 @@ def get_tab_html(tab_id):
             event.wait()
     except Timeout:
         del events_by_id[request_id]
-        return {'status': 'error', 'message': 'Timeout waiting for getTabHTML',
-                'error': 'timeout'}, 408
+        return timeout_response('getTabHTML'), 408
 
     result = results_by_id.get(request_id)
     del events_by_id[request_id]

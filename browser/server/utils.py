@@ -1,12 +1,26 @@
 import os
 from urllib.parse import unquote
 import logging
+from dataclasses import dataclass, field, asdict
 
 from functools import wraps
 from flask import Response, request
 
 
 valid_token = None
+
+@dataclass
+class TimeoutResponse:
+    route_name: str = field(init=True)
+    message: str = field(init=False)
+    result: str = 'timeout'
+    status: str = 'error'
+    
+    def __post_init__(self):
+        self.message = f'Timeout waiting for {self.route_name}'
+
+def timeout_response(route_name):
+    return TimeoutResponse(route_name=route_name).asdict()
 
 
 def setup_logger(log_file, logger_name=__name__, level=logging.DEBUG):

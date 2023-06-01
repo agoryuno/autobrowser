@@ -166,7 +166,6 @@ paths:
                     type: string
                     enum: ['timeout']
 
-
   /injectScript:
     post:
       summary: Inject a script
@@ -183,10 +182,48 @@ paths:
                   type: integer
       responses:
         '200':
-          description: Success
-        '408':
-          description: Timeout error
-
+            description: OK - this return code means only that the script was successfully injected, any errors raised by the script in the browser are also returned under this code.
+            content:
+              application/json:
+                schema:
+                  properties:
+                    status:
+                      type: string
+                      enum: ['success']
+                    message:
+                      type: string
+                    result:
+                      type: integer
+          '400':
+            description: Error - this signals an error with script injection, not an error caused by the execution of the injected script.
+            content:
+              application/json:
+                schema:
+                  properties:
+                    status:
+                      type: string
+                      enum: ['error']
+                    message:
+                      type: string
+                    result:
+                      type: boolean
+                      enum: [false]
+                    
+          '408':
+            description: Timeout error
+            content:
+              application/json:
+                schema:
+                  properties:
+                    status:
+                      type: string
+                      enum: ['error']
+                    message:
+                      type: string
+                      enum: ['Timeout waiting for openTab']
+                    result:
+                      type: string
+                      enum: ['timeout']
   /waitForElement:
     post:
       summary: Wait for an element to become available in the page's DOM
@@ -260,9 +297,48 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['success']
+                  message:
+                    type: string
+                  result:
+                    type: string
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                  result:
+                    type: boolean
+                    enum: [false]
+                  
         '408':
           description: Timeout error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                    enum: ['Timeout waiting for openTab']
+                  result:
+                    type: string
+                    enum: ['timeout']
 
   /health:
     get:

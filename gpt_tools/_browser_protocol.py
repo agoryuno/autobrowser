@@ -11,6 +11,7 @@ OpenTabReturnValue = Union[int, BrowserError, TimeoutError, Exception]
 CloseTabByIdReturnValue = WaitForElementReturnValue
 TabsListReturnValue = Union[List[Dict[str, Union[int, str]]], 
                             BrowserError, TimeoutError, Exception]
+TabHTMLReturnValue = Union[str, BrowserError, TimeoutError, Exception]
 
 
 class SessionProtocol(Protocol):
@@ -71,7 +72,7 @@ class BrowserProtocol(ABC):
         ...
 
     @abstractmethod
-    def get_tab_html(self, tab_id: int) -> Optional[str]:
+    def get_tab_html(self, tab_id: int) -> TabHTMLReturnValue:
         ...
 
     @abstractmethod
