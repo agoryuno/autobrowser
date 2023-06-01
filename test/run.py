@@ -10,6 +10,7 @@ from html.parser import HTMLParser
 
 
 from gpt_tools import Browser
+from gpt_tools.exceptions import BrowserError
 
 
 # Configure logging
@@ -209,47 +210,58 @@ class TestAddFunction(unittest.TestCase):
         
     def atest_tabsList(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        result, code = browser.tabs_list()
-        self.assertEqual(result["result"][0]['title'], 'GPT browser')
-        self.assertEqual(code, 200)
+        tabs = browser.tabs_list()
+        self.assertIsInstance(tabs, list)
+        self.assertGreater(len(tabs), 0)
+        self.assertIsInstance(tabs[0], dict)
+        self.assertIn(tabs[0], 'id')
+        self.assertIn(tabs[0], 'title')
+        self.assertIn(tabs[0], 'url')
 
-    def atest_openUrl(self):
+    def test_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        result, code = browser.open_tab("https://www.google.com")
-        self.assertEqual(code, 200)
-        self.assertIsInstance(result["result"], int)
-        result, code = browser.close_tab_by_id(result["result"])
-        self.assertEqual(code, 200)
-        result, code = browser.open_tab("")
-        self.assertEqual(code, 200)
+        tab_id = browser.open_tab("https://www.google.com")
+        self.assertIsInstance(tab_id, int)
+        result = browser.close_tab_by_id(tab_id)
+        self.assertTrue(result)
+        tab_id = browser.open_tab("")
+        self.assertIsInstance(tab_id, int)
 
-    def atest_close_tab_by_id(self):
+    def test_close_tab_by_id(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        res, code = browser.close_tab_by_id(18446744073709551615)
-        self.assertTrue(code == 400)
-        s = "Type error for parameter tabIds"
-        self.assertEqual(res['message'][:len(s)], s)
-        res, code = browser.close_tab_by_id(10)
-        self.assertTrue(code == 400)
-        self.assertEqual(res['message'], 'Invalid tab ID: 10')
+        self.assertRaises(BrowserError, 
+                          browser.close_tab_by_id, 18446744073709551615
+                          )
+        try:
+            browser.close_tab_by_id(18446744073709551615)
+        except BrowserError as e:
+            s = "Type error for parameter tabIds"
+            self.assertEqual(str(e)[:len(s)], s)
+        
+        self.assertRaises(BrowserError,
+                          browser.close_tab_by_id, 10)
+        try:
+            browser.close_tab_by_id(10)
+        except BrowserError as e:
+            s = "Invalid tab ID: 10"
+            self.assertEqual(str(e)[:len(s)], s)
 
     def test_wait_for_element(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        result, code = browser.open_tab("https://www.google.com")
-        self.assertEqual(code, 200)
-        res = browser.wait_for_element(result['result'], "html body form textarea")
-        print (res)
-        self.assertTrue(res)
+        tab_id = browser.open_tab("https://www.google.com")
+        self.assertIsInstance(tab_id, int)
+        tab_id = browser.wait_for_element(tab_id, "html body form textarea")
+        self.assertIsInstance(tab_id, int)
 
     def atest_get_tab_html(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        tab_id = browser.open_tab("https://www.google.com")
+        result, code = browser.open_tab("https://www.google.com")
+        tab_id = result['result']
         browser.wait_for_element(tab_id, "html body form textarea")
         html = browser.get_tab_html(tab_id)
+        print (html)
         self.assertIsInstance(html, str)
         self.assertTrue(is_valid_html(html))
-
-
 
     def atest_inject_script(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)

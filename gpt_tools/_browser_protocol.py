@@ -1,8 +1,17 @@
 from abc import ABC, abstractmethod
 from typing import Literal, Optional, Any, Protocol, Coroutine, Tuple
+from typing import Union, List, Dict
 import aiohttp
 
+from .exceptions import BrowserError
+
 APIReturnValue = Tuple[dict, Literal[200, 400, 408, 500]]
+WaitForElementReturnValue = Union[Literal[True], BrowserError, TimeoutError, Exception]
+OpenTabReturnValue = Union[int, BrowserError, TimeoutError, Exception]
+CloseTabByIdReturnValue = WaitForElementReturnValue
+TabsListReturnValue = Union[List[Dict[str, Union[int, str]]], 
+                            BrowserError, TimeoutError, Exception]
+
 
 class SessionProtocol(Protocol):
     def request(self, method: Literal["POST", "GET"], url: str, **kwargs) -> Any:
@@ -31,15 +40,15 @@ class BrowserProtocol(ABC):
 
     @abstractmethod
     def close_tab_by_id(self, 
-                        tab_id: int) -> APIReturnValue:
+                        tab_id: int) -> CloseTabByIdReturnValue:
         ...
 
     @abstractmethod
-    def tabs_list(self) -> APIReturnValue:
+    def tabs_list(self) -> TabsListReturnValue:
         ...
 
     @abstractmethod
-    def open_tab(self, url: str) -> APIReturnValue:
+    def open_tab(self, url: str) -> OpenTabReturnValue:
         ...
 
     @abstractmethod
@@ -58,7 +67,7 @@ class BrowserProtocol(ABC):
     def wait_for_element(self,
                          tab_id: int,
                          selector: str,
-                         ) -> bool:
+                         ) -> WaitForElementReturnValue:
         ...
 
     @abstractmethod

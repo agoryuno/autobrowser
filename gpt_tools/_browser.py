@@ -12,6 +12,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from ._browser_protocol import BrowserProtocol
+from .exceptions import BrowserError
 
 BASE_URL = "https://localhost"
 
@@ -60,15 +61,29 @@ class Browser(BrowserProtocol):
         except ValueError as e:
             raise ValueError(f"Error parsing JSON: {e}")
     
+    def _reply(self, request_result):
+        result, code = request_result
+        if code == 400:
+            raise BrowserError(result["message"])
+        if code == 408:
+            raise TimeoutError(result["message"])
+        if result["status"] == "success":
+            return result.get('result', True)
+        raise Exception(f"Unknown error: {result}")
+
     def close_tab_by_id(self, 
                         tab_id: int):
-        return self.request("POST", f"{self.base_url}/closeTabById", json={"tab_id": tab_id})
+        return self._reply(self.request("POST", 
+                                 f"{self.base_url}/closeTabById", 
+                                 json={"tab_id": tab_id}))
 
-    def tabs_list(self) -> Optional[dict]:
-        return self.request("GET", f"{self.base_url}/tabsList")
+    def tabs_list(self):
+         return self._reply(self.request("GET", f"{self.base_url}/tabsList"))
 
     def open_tab(self, url: str):
-        return self.request("POST", f"{self.base_url}/openTab", json={"url": url})
+        return self._reply(self.request("POST", 
+                                 f"{self.base_url}/openTab", 
+                                 json={"url": url}))
 
     def execute_script(self, 
                        tab_id: int, 
@@ -93,14 +108,14 @@ class Browser(BrowserProtocol):
             return result['result']
 
 
-    def wait_for_element(self, tab_id, selector, timeout=None) -> Literal[True, False]:
+    def wait_for_element(self, tab_id, selector, timeout=None):
         data = {"tab_id": tab_id, "selector": selector}
         if timeout:
             data["timeout"] = timeout
-        print ("browser.wait_for_element called with args: ", data)
-        return self.request("POST",
-                            f"{self.base_url}/waitForElement",
-                            json=data)
+        return self._reply(self.request("POST",
+                                 f"{self.base_url}/waitForElement",
+                                 json=data))
+
         
 
     def get_tab_html(self, tab_id: int) -> Union[str, dict]:
