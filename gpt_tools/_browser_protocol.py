@@ -12,6 +12,7 @@ CloseTabByIdReturnValue = WaitForElementReturnValue
 TabsListReturnValue = Union[List[Dict[str, Union[int, str]]], 
                             BrowserError, TimeoutError, Exception]
 TabHTMLReturnValue = Union[str, BrowserError, TimeoutError, Exception]
+InjectScriptReturnValue = TabHTMLReturnValue
 
 
 class SessionProtocol(Protocol):
@@ -61,7 +62,7 @@ class BrowserProtocol(ABC):
     @abstractmethod
     def inject_script(self, 
                       tab_id: int, 
-                      code: str) -> Any:
+                      code: str) -> InjectScriptReturnValue:
         ...
 
     @abstractmethod

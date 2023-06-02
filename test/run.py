@@ -258,7 +258,6 @@ class TestAddFunction(unittest.TestCase):
         tab_id = browser.open_tab("https://www.google.com")
         browser.wait_for_element(tab_id, "html body form textarea")
         html = browser.get_tab_html(tab_id)
-        print (html)
         self.assertIsInstance(html, str)
         self.assertTrue(is_valid_html(html))
 
@@ -270,6 +269,7 @@ class TestAddFunction(unittest.TestCase):
         """
         window.result = 4 + 5;
         """)
+        print (res)
         self.assertEqual(int(res), 9)
 
         res = browser.inject_script(tab_id,

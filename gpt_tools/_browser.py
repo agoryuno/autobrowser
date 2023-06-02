@@ -12,7 +12,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from ._browser_protocol import BrowserProtocol
-from .exceptions import BrowserError
+from .exceptions import BrowserError, ServerError
 
 BASE_URL = "https://localhost"
 
@@ -51,7 +51,15 @@ class Browser(BrowserProtocol):
                     **kwargs) -> dict:
         
         # Add the token to the URL
-        url += f'?token={quote(self.token)}'
+        #url += f'?token={quote(self.token)}'
+        headers = {
+           'Authorization': f'Bearer {quote(self.token)}',
+        }
+
+        if not kwargs.get("headers"):
+            kwargs["headers"] = {}
+
+        kwargs["headers"].update(headers)
 
         response = self.session.request(method, url, **kwargs)
         if response.status_code == 401:
@@ -59,7 +67,7 @@ class Browser(BrowserProtocol):
         try:
             return response.json(), response.status_code
         except ValueError as e:
-            raise ValueError(f"Error parsing JSON: {e}")
+            return response.text, response.status_code
     
     def _reply(self, request_result):
         result, code = request_result
@@ -67,6 +75,8 @@ class Browser(BrowserProtocol):
             raise BrowserError(result["message"])
         if code == 408:
             raise TimeoutError(result["message"])
+        if code == 500:
+            raise ServerError(result)
         if result["status"] == "success":
             return result.get('result', True)
         raise Exception(f"Unknown error: {result}")
@@ -92,7 +102,7 @@ class Browser(BrowserProtocol):
                             f"{self.base_url}/executeScript", 
                             json={"tab_id": tab_id, "code": code})
 
-    def inject_script(self, tab_id, code) -> Optional[Any]:
+    def inject_script(self, tab_id, code):
         """
         Runs Javascript code in the context of the page. Note that
         **the code is not sandboxed** and is injected directly into the
@@ -101,11 +111,9 @@ class Browser(BrowserProtocol):
         The code can return an arbitrary object by assigning it to the
         `window.result` variable.
         """
-        result, _ = self.request("POST",
+        return self._reply(self.request("POST",
                             f"{self.base_url}/injectScript",
-                            json={"tab_id": tab_id, "code": code})
-        if result["status"] == "success":
-            return result['result']
+                            json={"tab_id": tab_id, "code": code}))
 
 
     def wait_for_element(self, tab_id, selector, timeout=None):

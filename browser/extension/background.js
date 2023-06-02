@@ -23,6 +23,7 @@ function listTabs() {
     })
 }
 
+
 async function closeTabByUrl(url) {
   try {
     const tabs = await browser.tabs.query({ url: url });
@@ -35,6 +36,7 @@ async function closeTabByUrl(url) {
     return false;
   }
 }
+
 
 async function closeTabById(tabId) {
   try {
@@ -112,19 +114,29 @@ function sendMessage(tabId, selector, timeout) {
 }
 
 
-async function injectScript_bg(tabId, source) {
-  try {
-    const result = await browser.tabs.sendMessage(
+function injectScript_bg(tabId, source) {
+  return new Promise((resolve, reject) => {
+    async function retryInjectScript() {
+      console.log("background script is injecting the script...");
+      
+      try {
+        const result = await browser.tabs.sendMessage(
           parseInt(tabId, 10),
           { action: 'injectScript', source: source }
-    );
-    console.log("injectScript_bg result: " + result);
-    return result;
-  } catch (error) {
-    console.error('Error injecting script into content script:', error);
-    return false;
-  }
+        );
+        console.log("injectScript_bg result: " + result);
+        resolve({'status': 'success', message: 'OK', 'result': result});
+      } catch (error) {
+          console.error('Error injecting script into content script:', error);
+          resolve({'status': 'success', 'message': 'OK', 'result': error.message});
+      }
+    }
+
+    // Start the first attempt
+    retryInjectScript();
+  });
 }
+
 
 
 function setupWebSocketConnection() {

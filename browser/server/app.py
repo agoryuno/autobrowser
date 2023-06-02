@@ -215,7 +215,7 @@ def inject_script():
     code = 200
     if result['status'] == "error":
         code = 400
-    return {'status': 'success' if result else 'error', 'result': result}, code
+    return {'status': 'success' if result else 'error', 'result': result['result']}, code
 
 
 @app.route('/waitForElement', methods=['POST'])

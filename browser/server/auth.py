@@ -43,6 +43,7 @@ def logout():
     logging.info('User logged out successfully.')
     return redirect(url_for('root'))
 
+
 def requires_login(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
