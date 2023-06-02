@@ -81,7 +81,7 @@ def read_token_from_file2(config):
         return f.read().strip()
 
 
-def require_valid_token(f):
+def require_valid_token_auth(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.args.get('token')
@@ -94,6 +94,28 @@ def require_valid_token(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def require_valid_token(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if auth_header is not None:
+            try:
+                scheme, token = auth_header.split(" ") 
+                if scheme.lower() != "bearer":
+                    return Response("Unauthorized Access - Invalid token scheme", status=401)
+            except ValueError:
+                return Response("Unauthorized Access - Invalid token format", status=401)
+        else:
+            return Response("Unauthorized Access - No Authorization Header", status=401)
+
+        token = unquote(token)
+        print("App received token: ", token)
+        print("App is looking for token: ", valid_token)
+        print("App is comparing: ", token == valid_token)
+        if not token or token != valid_token:
+            return Response("Unauthorized Access", status=401)
+        return f(*args, **kwargs)
+    return decorated_function
 
 def get_base_directory(config):
     # Get the application mode

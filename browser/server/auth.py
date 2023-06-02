@@ -21,7 +21,7 @@ import logging
 from flask import Blueprint, current_app
 from flask import redirect, url_for, session
 
-from utils import require_valid_token
+from utils import require_valid_token_auth
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -31,7 +31,7 @@ valid_token = None
 auth_blueprint = Blueprint('auth', __name__)
 
 @auth_blueprint.route('/auth')
-@require_valid_token
+@require_valid_token_auth
 def auth():
     session['logged_in'] = True
     logging.info(f'User logged in successfully. {session=}')
