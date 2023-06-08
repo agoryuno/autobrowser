@@ -138,7 +138,6 @@ function injectScript_bg(tabId, source) {
 }
 
 
-
 function setupWebSocketConnection() {
   // Create WebSocket connection using socket.io
   const webSocketURL = 'https://0.0.0.0/';

@@ -18,9 +18,14 @@ from flask_socketio import SocketIO
 import utils
 from utils import read_token_from_file
 from utils import require_valid_token
-from auth import auth_blueprint, requires_login
 from utils import setup_logger, timeout_response
 from socket_manager import SocketManager
+from common import call_open_tab
+from shared_data import events_by_id, results_by_id, TIMEOUT
+
+
+from auth import auth_blueprint, requires_login
+from search import search_blueprint
 
 sock_status = SocketManager()
 
@@ -29,9 +34,9 @@ logger = setup_logger('/app/flask-log.txt')
 logger.setLevel(logging.DEBUG)
 
 # The dictionary to hold request ids
-events_by_id = {}
+#events_by_id = {}
 # The dictionary to hold request results
-results_by_id = {}
+#results_by_id = {}
 
 # Set up command line arguments
 parser = argparse.ArgumentParser()
@@ -50,7 +55,7 @@ TIMEOUT = int(config['FLASK']['TIMEOUT'])
 valid_token = read_token_from_file(args.token_file)
 utils.valid_token = valid_token
 
-print (f"App set valid token to: {valid_token}")
+logger.debug (f"App set valid token to: {valid_token}")
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -59,6 +64,7 @@ app.config['SECRET_KEY'] = valid_token
 
 # Register blueprints
 app.register_blueprint(auth_blueprint, url_prefix='/')
+app.register_blueprint(search_blueprint, url_prefix='/')
 
 socketio = SocketIO(app,
                     cors_allowed_origins="*", 
@@ -154,33 +160,11 @@ def get_tabs():
 @require_valid_token
 def open_tab():
     _url = request.json['url']
-    event = Event()
-    request_id = str(uuid.uuid4())
-    events_by_id[request_id] = event
+    result, code = call_open_tab(socketio, _url)
 
-    socketio.emit('open_new_tab', {'url': _url, 'request_id': request_id})
-
-    logger.debug ("open_tab: emitted open_new_tab event")
-    try:
-        with Timeout(TIMEOUT):
-            event.wait()
-    except Timeout:
-        del events_by_id[request_id]
-        if request_id in results_by_id:
-            del results_by_id[request_id]
-        return timeout_response('openTab'), 408
+    logger.debug(f"open_tab: {result=}, {code=}")
+    return result, code
     
-    result = results_by_id.get(request_id)
-    del events_by_id[request_id]
-    del results_by_id[request_id]
-    logger.debug(f"open_tab: {result=}")
-    code = 200
-    if not result["result"]:
-        code = 400
-    return {'status': 'success' if result['result'] else 'error', 
-            'result': result['result'],
-            'message': result['message'] if not result['result'] else 'OK'}, code
-
 
 @app.route('/injectScript', methods=['POST'])
 @require_valid_token

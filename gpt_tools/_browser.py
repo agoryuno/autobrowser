@@ -1,10 +1,10 @@
 from typing import Literal, Optional, Any, Coroutine
 from typing import Union
 from requests.sessions import Session
-import aiohttp
 import asyncio
 from urllib.parse import quote
 
+import aiohttp
 from aiohttp import TCPConnector
 
 import requests
@@ -126,6 +126,15 @@ class Browser(BrowserProtocol):
 
     def get_tab_html(self, tab_id: int) -> Union[str, dict]:
         return self._reply(self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}"))
+
+    def search(self, query, max_results, timeout=None):
+        data = {'query': query,
+                'max_results': max_results}
+        if timeout:
+            data["timeout"] = timeout
+        return self._reply(self.request("GET", 
+                     f"{self.base_url}/search",
+                     json=data))
 
     def is_ready(self):
         result, _ = self.request("GET", f"{self.base_url}/health")

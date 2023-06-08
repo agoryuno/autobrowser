@@ -278,5 +278,9 @@ class TestAddFunction(unittest.TestCase):
                               """)
         self.assertEqual(res, "TypeError: invalid assignment to const 'a'")
 
+    def test_search(self):
+        browser = Browser(TestAddFunction.token, trusted_ca=False)
+        browser.
+
 if __name__ == '__main__':
     unittest.main()

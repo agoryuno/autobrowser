@@ -220,10 +220,25 @@ paths:
                       enum: ['error']
                     message:
                       type: string
-                      enum: ['Timeout waiting for openTab']
+                      enum: ['Timeout waiting for injectScript']
                     result:
                       type: string
                       enum: ['timeout']
+          '500':
+            description: An unknown server error
+            content:
+              application/json:
+                schema:
+                  properties:
+                    status:
+                      type: string
+                      enum: ['error']
+                    message:
+                      type: string
+                      enum: ['Unknown server error occured. Failed to receive a result from the browser.']
+                    result:
+                      type: boolean
+                      enum: [false]
   /waitForElement:
     post:
       summary: Wait for an element to become available in the page's DOM
@@ -335,7 +350,7 @@ paths:
                     enum: ['error']
                   message:
                     type: string
-                    enum: ['Timeout waiting for openTab']
+                    enum: ['Timeout waiting for getTabHTML']
                   result:
                     type: string
                     enum: ['timeout']
@@ -345,4 +360,86 @@ paths:
       summary: Health check
       responses:
         '200':
-          description: Success
+          description: The service is up and running
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['success']
+                  message:
+                    type: string
+                  result:
+                    type: boolean
+                    enum: [true]
+
+  /search:
+    get:
+      summary: Execute a Google search for a given query, openning a new tab. The tab is closed after the search results are returnd.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                query:
+                  type: string
+                timeout:
+                  type: integer
+                  default: 60
+                max_results:
+                  type: integer
+                  default: 20
+      responses:
+        '200':
+          description: Successfully executed the search, returning the search results
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['success']
+                  message:
+                    type: string
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        url:
+                          type: string
+                        snippet:
+                          type: string
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                  result:
+                    type: boolean
+                    enum: [false]
+                  
+        '408':
+          description: Timeout error
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: string
+                    enum: ['error']
+                  message:
+                    type: string
+                    enum: ['Timeout waiting for search']
+                  result:
+                    type: string
+                    enum: ['timeout']
