@@ -102,8 +102,6 @@ def root():
     return Response(html_content, content_type='text/html')
 
 
-
-
 @app.route('/injectScript', methods=['POST'])
 @require_valid_token
 def inject_script():
@@ -230,7 +228,6 @@ def get_tab_html(tab_id):
     del events_by_id[request_id]
     del results_by_id[request_id]
     return {'status': 'success' if result else 'error', 'result': result}
-
 
 
 @app.route('/health', methods=['GET'])

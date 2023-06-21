@@ -5,7 +5,7 @@ from flask import request
 from flask import Blueprint, current_app
 
 from utils import require_valid_token
-from common import call_open_tab
+from common import call_open_tab, load_url_in_tab
 
 
 logger = logging.getLogger("autobrowser")
@@ -33,9 +33,16 @@ def search():
     logger.debug(f"search/: {max_results=}")
 
     logger.debug(f"search/: calling open_tab with {socketio=}, {query=}")
-    result, code = call_open_tab(socketio, 
-                                 f'https://www.google.com/search?q={quote(query)}',
+
+    tab_id = data.get('tab_id')
+    url_ = f'https://www.google.com/search?q={quote(query)}'
+    if not tab_id:
+        result, code = call_open_tab(socketio, 
+                                 url_,
                                  )
+    else:
+        result, code = load_url_in_tab(socketio, tab_id, url_)
+
     logger.debug(f"search/ call_open_tab returns: {result=}, {code=}")
 
     if code == 500:

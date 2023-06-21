@@ -1,5 +1,20 @@
 // background.js
 
+
+async function loadUrlInTab(tabId, url) {
+  try {
+    let updated = await browser.tabs.update(tabId, { url: url });
+    if (updated.url === url) {
+      return {result: true, message: ''};
+    } else {
+      throw new Error(`Failed to load URL in tab: ${url}`);
+    }
+  } catch (err) {
+    console.error('Failed to update tab:', err);
+    return {result: false, message: err.message};
+  }
+}
+
 async function openNewTab(url) {
   try {
     console.log('Opening new tab:', url);
@@ -11,16 +26,19 @@ async function openNewTab(url) {
   }
 }
 
-function listTabs() {
-  return browser.tabs.query({})
-    .then((tabs) => {
-      const tabList = tabs.map((tab) => ({
-        id: tab.id, 
-        url: tab.url,
-        title: tab.title 
-      }));
-      return tabList;
-    })
+
+async function listTabs() {
+  try {
+    const tabs = await browser.tabs.query({});
+    const tabList = tabs.map((tab) => ({
+      id: tab.id, 
+      url: tab.url,
+      title: tab.title 
+    }));
+    return tabList;
+  } catch (err) {
+    console.error('Failed to list tabs:', err);
+  }
 }
 
 
@@ -162,6 +180,22 @@ function setupWebSocketConnection() {
       console.error('Error listing tabs:', error);
       socket.emit('message', { result: false, message: error.message, request_id: data['request_id'] });
     }
+  });
+
+  socket.on('load_url_in_tab', async (data) => {
+    console.log("load_url_in_tab request received");
+    try {
+      const result = await loadUrlInTab(data['tab_id'], data['url']);
+      socket.emit('message', { result: result.result,
+          message: result.message,
+          request_id: data['request_id'] });
+    } catch (error) {
+      socket.emit('message', { 
+        result: false, 
+        message: error.message, 
+        request_id: data['request_id']
+      })
+    };
   });
   
   socket.on('close_tab_by_url', async (data) => {
