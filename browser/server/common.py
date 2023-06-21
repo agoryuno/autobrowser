@@ -1,4 +1,5 @@
 import uuid
+import logging
 
 from gevent.event import Event
 from gevent.timeout import Timeout
@@ -6,7 +7,14 @@ from gevent.timeout import Timeout
 from shared_data import events_by_id, results_by_id, TIMEOUT
 from utils import timeout_response
 
+logger = logging.getLogger("autobrowser")
+logger.setLevel(logging.DEBUG)
+
+
 def call_open_tab(socketio, url_: str) -> tuple[dict, int]:
+    print (f"call_open_tab(): {logger=}")
+    logger.debug(f"call_open_tab: {url_=}")
+
     event = Event()
     request_id = str(uuid.uuid4())
     socketio.emit('open_new_tab', {'url': url_, 'request_id': request_id})

@@ -132,13 +132,13 @@ class Browser(BrowserProtocol):
     def search(self, query, max_results, timeout=None):
         data = {'query': query,
                 'max_results': max_results}
+        print (f"browser.search: {data=}")
         if timeout:
             data["timeout"] = timeout
         res = self.request("GET", 
                      f"{self.base_url}/search",
                      json=data)
-        print (res)
-        assert False
+        print (f"browser.search: {res=}")
         return self._reply(res)
 
     def is_ready(self):

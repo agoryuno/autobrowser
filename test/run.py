@@ -88,6 +88,7 @@ def restart_container(image_name=IMAGE_NAME,
                '-v', f'{config_path}:/app/config.ini:ro',
                '-v', f'{base_dir}/token.txt:/app/token.txt',
                '-v', f'{base_dir}/flask-log.txt:/app/flask-log.txt',
+               '-v', f'{base_dir}/flask-cmd.log:/app/flask-cmd.log',
                '-p', '443:443',
                '-p', '5900:5900',
                image_name]
@@ -279,9 +280,10 @@ class TestAddFunction(unittest.TestCase):
 
     def test_search(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        tab_id = browser.open_tab("https://www.google.com")
-        res = browser.wait_for_element(tab_id, "html body form textarea")
-        res = browser.search(tab_id, "google")
+        #tab_id = browser.open_tab("https://www.google.com")
+        #res = browser.wait_for_element(tab_id, "html body form textarea")
+        max_results = 10
+        res = browser.search(max_results, "google")
         print (res)
 
 

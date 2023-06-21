@@ -6,6 +6,9 @@ from dataclasses import dataclass, field, asdict
 from functools import wraps
 from flask import Response, request
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
 
 valid_token = None
 
@@ -23,13 +26,13 @@ def timeout_response(route_name):
     return TimeoutResponse(route_name=route_name).asdict()
 
 
-def setup_logger(log_file, logger_name=__name__, level=logging.DEBUG):
+def setup_logger(log_file, logger_name="autobrowser", level=logging.DEBUG):
     """
     Set up logging configuration.
 
     Parameters:
     - log_file: Path to the log file.
-    - logger_name: Name of the logger. Default is __name__.
+    - logger_name: Name of the logger. Default is "autobrowser".
     - level: Log level. Default is logging.DEBUG.
     """
 
@@ -52,6 +55,11 @@ def setup_logger(log_file, logger_name=__name__, level=logging.DEBUG):
     logger.addHandler(file_handler)
 
     return logger
+
+
+logger = setup_logger('/app/flask-log.txt')
+
+logger.setLevel(logging.DEBUG)
 
 
 def read_token_from_file(filepath):

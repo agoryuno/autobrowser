@@ -3,33 +3,40 @@ from urllib.parse import quote
 
 from flask import request
 from flask import Blueprint, current_app
-from flask import redirect, url_for, session
 
-from utils import require_valid_token_auth
-from shared_data import events_by_id, results_by_id
+from utils import require_valid_token
 from common import call_open_tab
-from utils import setup_logger, timeout_response
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-logger = None #setup_logger('/app/flask-log.txt')
-
-#logger.setLevel(logging.DEBUG)
+logger = logging.getLogger("autobrowser")
 
 #valid_token = None
 
 search_blueprint = Blueprint('search', __name__)
 
 @search_blueprint.route('/search', methods=['GET'])
-@require_valid_token_auth
+@require_valid_token
 def search():
-    print("search/")
-    query = request.args.get('query', type=str)
-    timeout = request.args.get('timeout', default=60, type=int)
-    max_results = request.args.get('max_results', default=20, type=int)
+    socketio = current_app.config['socketio']
+    logger.debug(f"search/: {socketio=}")
+    data: dict = request.get_json()
+    query = data.get('query')
+    try:
+        query = str(query)
+    except:
+        return {'status': 'error', 'result': False, 
+                'message': f'Unable to convert query to string, {query=}'}, 400
+    logger.debug(f"search/: {query=}")
+    timeout = data.get('timeout', 60)
+    logger.debug(f"search/: {timeout=}")
+    max_results = data.get('max_results', 20)
+    logger.debug(f"search/: {max_results=}")
 
-    logger.debug ("search/ : ", query, timeout, max_results)
-    result, code = call_open_tab(current_app.socketio, f'https://www.google.com/search?q={quote(query)}')
+    logger.debug(f"search/: calling open_tab with {socketio=}, {query=}")
+    result, code = call_open_tab(socketio, 
+                                 f'https://www.google.com/search?q={quote(query)}',
+                                 )
+    logger.debug(f"search/ call_open_tab returns: {result=}, {code=}")
 
     if code == 500:
         logger.debug(f"/search: failed to open tab: {result=}, {code=}")

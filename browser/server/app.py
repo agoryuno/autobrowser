@@ -1,4 +1,5 @@
 import uuid
+from urllib.parse import quote
 
 from gevent import monkey
 monkey.patch_all()
@@ -26,15 +27,13 @@ from shared_data import events_by_id, results_by_id, TIMEOUT
 
 from auth import auth_blueprint, requires_login
 from search import search_blueprint
-from search import logger as search_logger
+from tabs import tabs_blueprint
 
 sock_status = SocketManager()
 
 logger = setup_logger('/app/flask-log.txt')
 
 logger.setLevel(logging.DEBUG)
-
-search_logger = logger
 
 # The dictionary to hold request ids
 #events_by_id = {}
@@ -68,13 +67,14 @@ app.config['SECRET_KEY'] = valid_token
 # Register blueprints
 app.register_blueprint(auth_blueprint, url_prefix='/')
 app.register_blueprint(search_blueprint, url_prefix='/')
-
+app.register_blueprint(tabs_blueprint, url_prefix='/tabs')
 
 socketio = SocketIO(app,
                     cors_allowed_origins="*", 
                     async_mode='gevent',
                     )
 
+app.config['socketio'] = socketio
 connected_sockets = set()
 
 # Define HTML content
@@ -130,45 +130,6 @@ def close_tab_by_id():
 
     return {'status': 'success', 'message': ''}, 200
 
-
-@app.route('/tabsList', methods=['GET'])
-@require_valid_token
-def get_tabs():
-    event = Event()
-    request_id = str(uuid.uuid4())
-    events_by_id[request_id] = event
-
-    logger.debug(f'get_tabs: {request_id=}')
-    logger.debug('get_tabs: emitting tabs_list event')
-    socketio.emit('tabs_list', {'request_id': request_id})
-
-    try:
-        with Timeout(TIMEOUT):  # Set a timeout (e.g., 10 seconds) to avoid blocking indefinitely
-            event.wait()
-    except Timeout:
-        del events_by_id[request_id]
-        if request_id in results_by_id:
-            del results_by_id[request_id]
-        return timeout_response('tabsList'), 408
-
-    tabs = results_by_id.get(request_id)
-    del events_by_id[request_id]
-    del results_by_id[request_id]
-    if tabs['result']:
-        return {'status': 'success', 'result': [tab for tab in tabs['result']],
-            'message': 'OK'}, 200
-    return {'status': 'error', 'message': tabs['message'], 'result': False}, 400
-
-
-@app.route('/openTab', methods=['POST'])
-@require_valid_token
-def open_tab():
-    _url = request.json['url']
-    result, code = call_open_tab(socketio, _url)
-
-    logger.debug(f"open_tab: {result=}, {code=}")
-    return result, code
-    
 
 @app.route('/injectScript', methods=['POST'])
 @require_valid_token
@@ -296,6 +257,8 @@ def get_tab_html(tab_id):
     del events_by_id[request_id]
     del results_by_id[request_id]
     return {'status': 'success' if result else 'error', 'result': result}
+
+
 
 @app.route('/health', methods=['GET'])
 @require_valid_token
