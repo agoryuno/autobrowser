@@ -67,7 +67,7 @@ app.config['SECRET_KEY'] = valid_token
 # Register blueprints
 app.register_blueprint(auth_blueprint, url_prefix='/')
 app.register_blueprint(search_blueprint, url_prefix='/')
-app.register_blueprint(tabs_blueprint, url_prefix='/tabs')
+app.register_blueprint(tabs_blueprint, url_prefix='/')
 
 socketio = SocketIO(app,
                     cors_allowed_origins="*", 
@@ -102,33 +102,6 @@ def root():
     return Response(html_content, content_type='text/html')
 
 
-@app.route('/closeTabById', methods=['POST'])
-@require_valid_token
-def close_tab_by_id():
-    tab_id = request.json['tab_id']
-    event = Event()
-    request_id = str(uuid.uuid4())
-    events_by_id[request_id] = event
-
-    socketio.emit('close_tab_by_id', {'tab_id': tab_id, 'request_id': request_id})
-
-    try:
-        with Timeout(TIMEOUT):
-            event.wait()
-    except Timeout:
-        del events_by_id[request_id]
-        if request_id in results_by_id:
-            del results_by_id[request_id]
-        return timeout_response('closeTabById'), 408
-
-    result = results_by_id.get(request_id)
-    del events_by_id[request_id]
-    del results_by_id[request_id]
-
-    if not result["result"]:
-        return {'status': 'error', 'message': result["message"]}, 400
-
-    return {'status': 'success', 'message': ''}, 200
 
 
 @app.route('/injectScript', methods=['POST'])

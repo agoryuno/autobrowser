@@ -24,7 +24,7 @@ logger = logging.getLogger("autobrowser")
 tabs_blueprint = Blueprint('tabs', __name__)
 
 
-@tabs_blueprint.route('/search', methods=['GET'])
+@tabs_blueprint.route('/tabsList', methods=['GET'])
 @require_valid_token
 def get_tabs():
     socketio = current_app.config['socketio']
@@ -57,11 +57,13 @@ def get_tabs():
 @tabs_blueprint.route('/openTab', methods=['POST'])
 @require_valid_token
 def open_tab():
+    logger.debug(f"open_tab: {request.json=}")
     socketio = current_app.config['socketio']
     _url = request.json['url']
+    logger.debug(f"open_tab: call_open_tab() with {_url=}")
     result, code = call_open_tab(socketio, _url)
+    logger.debug(f"open_tab: call_open_tab() returned {result=}, {code=}")
 
-    logger.debug(f"open_tab: {result=}, {code=}")
     return result, code
 
 
