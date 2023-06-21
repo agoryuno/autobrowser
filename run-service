@@ -27,9 +27,9 @@ else
         if [ "$MODE" = "DEV" ]; then
             rm -f $base_dir/flask-log.txt
             touch $base_dir/flask-log.txt
-            docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $base_dir/token.txt:/app/token.txt -v $base_dir/flask-log.txt:/app/flask-log.txt -p 443:443 -p 5900:5900 $IMAGE_NAME
+            docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $base_dir/token.txt:/app/token.txt -v $base_dir/flask-log.txt:/app/flask-log.txt -v $base_dir/flask-cmd.log:/app/flask-cmd.txt 443:443 -p 5900:5900 $IMAGE_NAME
         else
-            docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $base_dir/token.txt:/app/token.txt -p 443:443 -p 5900:5900 $IMAGE_NAME
+            docker run --name $CONTAINER_NAME -v $CONFIG_PATH:/app/config.ini:ro -v $base_dir/token.txt:/app/token.txt -v $base_dir/flask-cmd.log:/app/flask-cmd.txt -p 443:443 -p 5900:5900 $IMAGE_NAME
         fi
     fi
 fi

@@ -135,6 +135,5 @@ def get_base_directory(config):
     return root_path
 
 
-
 def test():
     print (f"{valid_token=}")

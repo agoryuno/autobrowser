@@ -58,7 +58,7 @@ flask_token=$(cat $token_file)
 
 # Start the Flask app in the background
 cd $base_dir/browser/server
-python app.py $token_file $config_file &
+python app.py $token_file $config_file 2> /app/flask-cmd.log &
 
 # Change the working directory back to the script's directory
 cd $script_dir

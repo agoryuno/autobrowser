@@ -12,7 +12,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from ._browser_protocol import BrowserProtocol
-from .exceptions import BrowserError, ServerError
+from .exceptions import BrowserError, ServerError, PageNotFound
 
 BASE_URL = "https://localhost"
 
@@ -73,6 +73,8 @@ class Browser(BrowserProtocol):
         result, code = request_result
         if code == 400:
             raise BrowserError(result["message"])
+        if code == 404:
+            raise PageNotFound(result["message"])
         if code == 408:
             raise TimeoutError(result["message"])
         if code == 500:
@@ -132,9 +134,12 @@ class Browser(BrowserProtocol):
                 'max_results': max_results}
         if timeout:
             data["timeout"] = timeout
-        return self._reply(self.request("GET", 
+        res = self.request("GET", 
                      f"{self.base_url}/search",
-                     json=data))
+                     json=data)
+        print (res)
+        assert False
+        return self._reply(res)
 
     def is_ready(self):
         result, _ = self.request("GET", f"{self.base_url}/health")

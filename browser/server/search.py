@@ -12,9 +12,9 @@ from utils import setup_logger, timeout_response
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-logger = setup_logger('/app/flask-log.txt')
+logger = None #setup_logger('/app/flask-log.txt')
 
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 
 #valid_token = None
 
@@ -23,12 +23,19 @@ search_blueprint = Blueprint('search', __name__)
 @search_blueprint.route('/search', methods=['GET'])
 @require_valid_token_auth
 def search():
+    print("search/")
     query = request.args.get('query', type=str)
     timeout = request.args.get('timeout', default=60, type=int)
     max_results = request.args.get('max_results', default=20, type=int)
 
+    logger.debug ("search/ : ", query, timeout, max_results)
     result, code = call_open_tab(current_app.socketio, f'https://www.google.com/search?q={quote(query)}')
+
+    if code == 500:
+        logger.debug(f"/search: failed to open tab: {result=}, {code=}")
 
     if code == 200:
         tab_id = result['result']
         logger.debug(f"/search: opened tab {tab_id=}")
+    
+    return result, code

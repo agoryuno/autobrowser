@@ -26,12 +26,15 @@ from shared_data import events_by_id, results_by_id, TIMEOUT
 
 from auth import auth_blueprint, requires_login
 from search import search_blueprint
+from search import logger as search_logger
 
 sock_status = SocketManager()
 
 logger = setup_logger('/app/flask-log.txt')
 
 logger.setLevel(logging.DEBUG)
+
+search_logger = logger
 
 # The dictionary to hold request ids
 #events_by_id = {}
@@ -65,6 +68,7 @@ app.config['SECRET_KEY'] = valid_token
 # Register blueprints
 app.register_blueprint(auth_blueprint, url_prefix='/')
 app.register_blueprint(search_blueprint, url_prefix='/')
+
 
 socketio = SocketIO(app,
                     cors_allowed_origins="*", 
@@ -205,21 +209,23 @@ def inject_script():
 @app.route('/waitForElement', methods=['POST'])
 @require_valid_token
 def wait_for_element():
+    logger.debug ('/waitForElement called')
     tab_id = request.json['tab_id']
     selector = request.json['selector']
+    logger.debug(f'/waitForElement: {selector=}, {tab_id=}: ')
     timeout = int(request.json.get('timeout', TIMEOUT))
     event = Event()
     request_id = str(uuid.uuid4())
     events_by_id[request_id] = event
 
-    logger.debug ('waitForElement route in app, calling browser: ', tab_id, selector, timeout, request_id)
+    logger.debug ('/waitForElement route in app, calling browser: ', tab_id, selector, timeout, request_id)
     socketio.emit('wait_for_element', {
         'tab_id': tab_id,
         'selector': selector,
         'timeout': timeout*1000,
         'request_id': request_id
     })
-
+    logger.debug('/waitForElement: browser called')
     try:
         with Timeout(timeout):
             event.wait()
@@ -230,6 +236,7 @@ def wait_for_element():
         return timeout_response('waitForElement'), 408
 
     result = results_by_id.get(request_id)
+    logger.debug(f'/waitForElement: {result=}')
     del events_by_id[request_id]
     del results_by_id[request_id]
     code = 200

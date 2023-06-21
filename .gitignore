@@ -14,3 +14,4 @@ config.ini
 base_config.ini
 flask-log.txt
 .venv/
+flask-cmd.log
