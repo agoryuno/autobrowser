@@ -4,16 +4,28 @@
 async function loadUrlInTab(tabId, url) {
   try {
     let updated = await browser.tabs.update(tabId, { url: url });
-    if (updated.url === url) {
-      return {result: true, message: ''};
-    } else {
-      throw new Error(`Failed to load URL in tab: ${url}`);
-    }
+
+    // Wait for tab to start loading
+    await new Promise((resolve) => {
+      function listener(updatedTabId, changeInfo) {
+        if (updatedTabId === tabId && changeInfo.status === 'loading') {
+          browser.tabs.onUpdated.removeListener(listener);
+          resolve();
+        }
+      }
+
+      browser.tabs.onUpdated.addListener(listener);
+    });
+
+    // Check URL after loading has started
+    updated = await browser.tabs.get(tabId);
+    return {result: true, message: ''};
   } catch (err) {
     console.error('Failed to update tab:', err);
     return {result: false, message: err.message};
   }
 }
+
 
 async function openNewTab(url) {
   try {

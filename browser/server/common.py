@@ -6,6 +6,8 @@ from gevent.timeout import Timeout
 
 from shared_data import events_by_id, results_by_id, TIMEOUT
 from utils import timeout_response
+from errors import UnknownServerError
+
 
 logger = logging.getLogger("autobrowser")
 logger.setLevel(logging.DEBUG)
@@ -28,7 +30,7 @@ def load_url_in_tab(socketio, tab_id: str, url_: str) -> tuple[dict, int]:
         del events_by_id[request_id]
         if request_id in results_by_id:
             del results_by_id[request_id]
-        return timeout_response('loadUrlInTab'), 408
+        return timeout_response('loadUrlInTab')
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
@@ -36,9 +38,7 @@ def load_url_in_tab(socketio, tab_id: str, url_: str) -> tuple[dict, int]:
 
     code = 200
     if not result:
-        return {'status': 'error',
-                'message': 'Unknown server error occured. Failed to receive a result from the browser.',
-                'result': False}, 500
+        return UnknownServerError(message='Unknown server error occured. Failed to receive a result from the browser.').to_response()
     
     if not result["result"]:
         code = 400
@@ -48,11 +48,12 @@ def load_url_in_tab(socketio, tab_id: str, url_: str) -> tuple[dict, int]:
 
 
 def call_open_tab(socketio, url_: str) -> tuple[dict, int]:
-    print (f"call_open_tab(): {logger=}")
     logger.debug(f"call_open_tab: {url_=}")
 
     event = Event()
     request_id = str(uuid.uuid4())
+    
+    logger.debug(f"call_open_tab: calling browser")
     socketio.emit('open_new_tab', {'url': url_, 'request_id': request_id})
     events_by_id[request_id] = event
 
@@ -63,19 +64,21 @@ def call_open_tab(socketio, url_: str) -> tuple[dict, int]:
         del events_by_id[request_id]
         if request_id in results_by_id:
             del results_by_id[request_id]
-        return timeout_response('openTab'), 408
+        return timeout_response('openTab')
     
     result = results_by_id.get(request_id)
     del events_by_id[request_id]
     del results_by_id[request_id]
 
+    logger.debug(f"call_open_tab: {result=}")
+
     code = 200
     if not result:
-        return {'status': 'error',
-                'message': 'Unknown server error occured. Failed to receive a result from the browser.',
-                'result': False}, 500
+        return UnknownServerError(message='Unknown server error occured. Failed to receive a result from the browser.').to_response()
     if not result["result"]:
         code = 400
+
+    
     return {'status': 'success' if result['result'] else 'error', 
             'result': result['result'],
             'message': result['message'] if not result['result'] else 'OK'}, code

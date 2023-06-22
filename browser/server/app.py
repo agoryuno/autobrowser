@@ -1,5 +1,4 @@
 import uuid
-from urllib.parse import quote
 
 from gevent import monkey
 monkey.patch_all()
@@ -21,13 +20,13 @@ from utils import read_token_from_file
 from utils import require_valid_token
 from utils import setup_logger, timeout_response
 from socket_manager import SocketManager
-from common import call_open_tab
 from shared_data import events_by_id, results_by_id, TIMEOUT
 
 
 from auth import auth_blueprint, requires_login
-from search import search_blueprint
 from tabs import tabs_blueprint
+from openUrl import openUrl_blueprint
+from errors import BasicError
 
 sock_status = SocketManager()
 
@@ -68,6 +67,7 @@ app.config['SECRET_KEY'] = valid_token
 app.register_blueprint(auth_blueprint, url_prefix='/')
 #app.register_blueprint(search_blueprint, url_prefix='/')
 app.register_blueprint(tabs_blueprint, url_prefix='/')
+app.register_blueprint(openUrl_blueprint, url_prefix='/')
 
 socketio = SocketIO(app,
                     cors_allowed_origins="*", 
@@ -76,6 +76,12 @@ socketio = SocketIO(app,
 
 app.config['socketio'] = socketio
 connected_sockets = set()
+
+
+@app.errorhandler(BasicError)
+def handle_errors(error: BasicError):
+    response, code = error.to_response()
+    return jsonify(response), code
 
 # Define HTML content
 html_content = '''
@@ -234,8 +240,8 @@ def get_tab_html(tab_id):
 @require_valid_token
 def health():
     if sock_status.connected:
-        return {'status': 'success', 'message': "The service is up and running."}
-    return {'status': 'error', 'message': "The service is not connected to the browser."}
+        return {'status': 'success', 'message': "The service is up and running."}, 200
+    return {'status': 'error', 'message': "The service is not connected to the browser."}, 503
 
 @socketio.on('connect')
 @requires_login

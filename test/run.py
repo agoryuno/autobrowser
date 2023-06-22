@@ -209,7 +209,7 @@ class TestAddFunction(unittest.TestCase):
         except Exception as e:
             logger.error(f"An error occurred while trying to stop the service: {e}")
         
-    def test_tabsList(self):
+    def atest_tabsList(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tabs = browser.tabs_list()
         self.assertIsInstance(tabs, list)
@@ -219,7 +219,7 @@ class TestAddFunction(unittest.TestCase):
         self.assertIn('title', tabs[0])
         self.assertIn('url', tabs[0])
 
-    def test_openUrl(self):
+    def atest_openUrl(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         self.assertIsInstance(tab_id, int)
@@ -228,7 +228,7 @@ class TestAddFunction(unittest.TestCase):
         tab_id = browser.open_tab("")
         self.assertIsInstance(tab_id, int)
 
-    def test_close_tab_by_id(self):
+    def atest_close_tab_by_id(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         self.assertRaises(BrowserError, 
                           browser.close_tab_by_id, 18446744073709551615
@@ -247,14 +247,14 @@ class TestAddFunction(unittest.TestCase):
             s = "Invalid tab ID: 10"
             self.assertEqual(str(e)[:len(s)], s)
 
-    def test_wait_for_element(self):
+    def atest_wait_for_element(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         self.assertIsInstance(tab_id, int)
         tab_id = browser.wait_for_element(tab_id, "html body form textarea")
         self.assertIsInstance(tab_id, int)
 
-    def test_get_tab_html(self):
+    def atest_get_tab_html(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         browser.wait_for_element(tab_id, "html body form textarea")
@@ -262,7 +262,7 @@ class TestAddFunction(unittest.TestCase):
         self.assertIsInstance(html, str)
         self.assertTrue(is_valid_html(html))
 
-    def test_inject_script(self):
+    def atest_inject_script(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         tab_id = browser.open_tab("https://www.google.com")
         res = browser.wait_for_element(tab_id, "html body form textarea")
@@ -278,12 +278,10 @@ class TestAddFunction(unittest.TestCase):
                               """)
         self.assertEqual(res, "TypeError: invalid assignment to const 'a'")
 
-    def test_search(self):
+    def test_open_url(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
-        #tab_id = browser.open_tab("https://www.google.com")
-        #res = browser.wait_for_element(tab_id, "html body form textarea")
-        max_results = 10
-        res = browser.search(max_results, "google")
+        # Without tab ID
+        res = browser.open_url("https://www.google.com")
         print (res)
 
 

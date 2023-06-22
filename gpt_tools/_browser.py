@@ -129,6 +129,13 @@ class Browser(BrowserProtocol):
     def get_tab_html(self, tab_id: int) -> Union[str, dict]:
         return self._reply(self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}"))
 
+    def open_url(self, url_: str, tab_id: Optional[int] = None):
+        data = {"url": url_}
+        if tab_id:
+            data["tab_id"] = tab_id
+        result, code = self.request("POST", f"{self.base_url}/openUrl", json=data)
+        return self._reply((result, code))
+
     def search(self, query, max_results, timeout=None):
         data = {'query': query,
                 'max_results': max_results}

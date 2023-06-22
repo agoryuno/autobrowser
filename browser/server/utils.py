@@ -6,24 +6,16 @@ from dataclasses import dataclass, field, asdict
 from functools import wraps
 from flask import Response, request
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+from errors import TimeoutError
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 valid_token = None
 
-@dataclass
-class TimeoutResponse:
-    route_name: str = field(init=True)
-    message: str = field(init=False)
-    result: str = 'timeout'
-    status: str = 'error'
-    
-    def __post_init__(self):
-        self.message = f'Timeout waiting for {self.route_name}'
 
 def timeout_response(route_name):
-    return TimeoutResponse(route_name=route_name).asdict()
+    return TimeoutError(message=f'Timeout waiting for {route_name}').to_response()
 
 
 def setup_logger(log_file, logger_name="autobrowser", level=logging.DEBUG):

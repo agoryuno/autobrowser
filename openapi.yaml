@@ -408,6 +408,7 @@ paths:
               schema:
                 oneOf:
                   $ref: '#/components/schemas/TabNotFoundError'
+                  $ref: '#/components/schemas/ArgumentTypeError'
 
 components:
   schemas:
@@ -420,6 +421,9 @@ components:
         result:
           type: boolean
           enum: [true]
+        message:
+          type: string
+          enum: ['OK']
     BasicError:
       type: object
       properties:
@@ -429,6 +433,14 @@ components:
         result:
           type: boolean
           enum: [false]
+    UnknownServerError:
+      allOf:
+        - $ref: '#/components/schemas/BasicError'
+        - type: object
+          properties:
+            message:
+              type: string
+              enum: ['Unknown server error occured.']
     TabNotFoundError:
       allOf:
         - $ref: '#/components/schemas/BasicError'
@@ -437,6 +449,14 @@ components:
             message:
               type: string
               enum: ['No tab with given ID was found']
+    ArgumentTypeError:
+      allOf:
+        - $ref: '#/components/schemas/BasicError'
+        - type: object
+          properties:
+            message:
+              type: string
+              enum: ['Invalid argument type']
     PageNotFoundError:
       allOf:
         - $ref: '#/components/schemas/BasicError'
