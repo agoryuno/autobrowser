@@ -395,6 +395,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BasicSuccess'
+        '408':
+          description: Timeout reached when trying to open the URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeoutError'
+        '400':
+          description: There is a problem with the request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  $ref: '#/components/schemas/TabNotFoundError'
 
 components:
   schemas:
@@ -416,6 +429,14 @@ components:
         result:
           type: boolean
           enum: [false]
+    TabNotFoundError:
+      allOf:
+        - $ref: '#/components/schemas/BasicError'
+        - type: object
+          properties:
+            message:
+              type: string
+              enum: ['No tab with given ID was found']
     PageNotFoundError:
       allOf:
         - $ref: '#/components/schemas/BasicError'
