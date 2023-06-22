@@ -66,7 +66,7 @@ app.config['SECRET_KEY'] = valid_token
 
 # Register blueprints
 app.register_blueprint(auth_blueprint, url_prefix='/')
-app.register_blueprint(search_blueprint, url_prefix='/')
+#app.register_blueprint(search_blueprint, url_prefix='/')
 app.register_blueprint(tabs_blueprint, url_prefix='/')
 
 socketio = SocketIO(app,
