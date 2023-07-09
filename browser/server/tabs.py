@@ -64,7 +64,7 @@ def open_tab():
     logger.debug(f"open_tab: {request.json=}")
     socketio = current_app.config['socketio']
     _url = request.json['url']
-    if not is_valid_url(_url):
+    if len(_url) > 0 and not is_valid_url(_url):
         raise InvalidUrlError(_url)
     logger.debug(f"open_tab: call_open_tab() with {_url=}")
     result, code = call_open_tab(socketio, _url)

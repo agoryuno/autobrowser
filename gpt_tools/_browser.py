@@ -93,6 +93,7 @@ class Browser(BrowserProtocol):
     def tabs_list(self):
          return self._reply(self.request("GET", f"{self.base_url}/tabsList"))
 
+
     def open_tab(self, url: str):
         try:
             return self._reply(self.request("POST", 
@@ -102,7 +103,7 @@ class Browser(BrowserProtocol):
             msg = e.args[0]
             if msg == "Invalid URL":
                 raise BrowserError(f"Invalid URL: '{url}'. "
-                                   "Make sure the `url` parameter if a fully qualified URL.")
+                                   "Make sure the `url` parameter is a fully qualified URL.")
 
     def execute_script(self, 
                        tab_id: int, 
@@ -134,7 +135,8 @@ class Browser(BrowserProtocol):
                                  json=data))
 
     def get_tab_html(self, tab_id: int) -> Union[str, dict]:
-        return self._reply(self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}"))
+        result = self._reply(self.request("GET", f"{self.base_url}/getTabHTML/{tab_id}"))
+        return result["message"]
 
     def open_url(self, url_: str, tab_id: Optional[int] = None):
         data = {"url": url_}
