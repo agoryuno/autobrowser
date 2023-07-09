@@ -52,6 +52,11 @@ class UnableToCreateTabError(BasicError):
     code: Optional[int] = 500
 
 
+@dataclass
+class InvalidUrlError(BasicError):
+    message: Optional[str] = 'Invalid URL'
+    code: Optional[int] = 400
+
 
 if __name__ == "__main__":
     url_ = 123

@@ -65,7 +65,6 @@ app.config['SECRET_KEY'] = valid_token
 
 # Register blueprints
 app.register_blueprint(auth_blueprint, url_prefix='/')
-#app.register_blueprint(search_blueprint, url_prefix='/')
 app.register_blueprint(tabs_blueprint, url_prefix='/')
 app.register_blueprint(openUrl_blueprint, url_prefix='/')
 
@@ -246,6 +245,7 @@ def health():
         return {'status': 'success', 'message': "The service is up and running."}, 200
     return {'status': 'error', 'message': "The service is not connected to the browser."}, 503
 
+
 @socketio.on('connect')
 @requires_login
 def handle_connect():
@@ -258,6 +258,7 @@ def handle_connect():
 def handle_disconnect():
     logger.debug(f'Client disconnected: {request.sid}')
     sock_status.connected = False
+
 
 @socketio.on('message')
 @requires_login

@@ -14,9 +14,13 @@ from gevent.event import Event
 from gevent.timeout import Timeout
 
 from utils import require_valid_token, timeout_response
+from utils import is_valid_url
 from common import call_open_tab
 
+from errors import InvalidUrlError
+
 from shared_data import events_by_id, results_by_id, TIMEOUT
+
 
 
 logger = logging.getLogger("autobrowser")
@@ -60,6 +64,8 @@ def open_tab():
     logger.debug(f"open_tab: {request.json=}")
     socketio = current_app.config['socketio']
     _url = request.json['url']
+    if not is_valid_url(_url):
+        raise InvalidUrlError(_url)
     logger.debug(f"open_tab: call_open_tab() with {_url=}")
     result, code = call_open_tab(socketio, _url)
     logger.debug(f"open_tab: call_open_tab() returned {result=}, {code=}")

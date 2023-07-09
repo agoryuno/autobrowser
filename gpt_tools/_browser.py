@@ -94,9 +94,15 @@ class Browser(BrowserProtocol):
          return self._reply(self.request("GET", f"{self.base_url}/tabsList"))
 
     def open_tab(self, url: str):
-        return self._reply(self.request("POST", 
+        try:
+            return self._reply(self.request("POST", 
                                  f"{self.base_url}/openTab", 
                                  json={"url": url}))
+        except BrowserError as e:
+            msg = e.args[0]
+            if msg == "Invalid URL":
+                raise BrowserError(f"Invalid URL: '{url}'. "
+                                   "Make sure the `url` parameter if a fully qualified URL.")
 
     def execute_script(self, 
                        tab_id: int, 
