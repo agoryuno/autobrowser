@@ -1,5 +1,5 @@
 import os
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 import logging
 from dataclasses import dataclass, field, asdict
 
@@ -12,6 +12,14 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 valid_token = None
+
+
+def is_valid_url(url):
+    try:
+        result = urlparse(url)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
 
 
 def timeout_response(route_name):

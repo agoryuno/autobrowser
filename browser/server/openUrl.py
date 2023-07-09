@@ -4,7 +4,7 @@ from urllib.parse import quote
 from flask import request
 from flask import Blueprint, current_app
 
-from utils import require_valid_token
+from utils import require_valid_token, is_valid_url
 from common import call_open_tab, load_url_in_tab
 from errors import ArgumentTypeError, UnableToCreateTabError
 from errors import ArgumentMissingError
@@ -28,6 +28,9 @@ def openUrl():
         url_ = str(url_)
     except:
         raise ArgumentTypeError(message=f'Unable to convert URL to string, URL={url_}')
+
+    if not is_valid_url(url_):
+        raise ArgumentTypeError(message=f'Invalid URL={url_}. URL must be fully qualified, e.g. https://www.google.com')
 
     tab_id = data.get('tab_id')
     if not tab_id:
