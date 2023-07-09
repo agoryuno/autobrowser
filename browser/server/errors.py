@@ -37,6 +37,11 @@ class TabNotFoundError(BasicError):
 
 
 @dataclass
+class ArgumentMissingError(BasicError):
+    message: Optional[str] = 'Missing argument'
+    code: Optional[int] = 400
+
+@dataclass
 class UnknownServerError(BasicError):
     message: Optional[str] = 'Unknown server error occured.'
     code: Optional[int] = 500

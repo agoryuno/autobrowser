@@ -7,6 +7,7 @@ from flask import Blueprint, current_app
 from utils import require_valid_token
 from common import call_open_tab, load_url_in_tab
 from errors import ArgumentTypeError, UnableToCreateTabError
+from errors import ArgumentMissingError
 from successes import OpenUrlSuccess
 
 
@@ -30,13 +31,17 @@ def openUrl():
 
     tab_id = data.get('tab_id')
     if not tab_id:
-        result, code = call_open_tab(socketio, url_)
-        logger.debug(f"openUrl/: call_open_tab returns: {result=}, {code=}")
-        if code == 200:
-            tab_id = result.get('result')
-            if not tab_id:
-                raise UnableToCreateTabError(message=f"/openUrl endpoint wasn't able to create a new tab for URL={url_}")
-            logger.debug(f"openUrl/: opened tab {tab_id=}")
+        #result, code = call_open_tab(socketio, url_)
+        logger.debug(f"openUrl/: called without tab ID")
+        raise ArgumentMissingError(message=f"openUrl called without tab ID")
+        #if code == 200:
+        #    tab_id = result.get('result')
+        #    if not tab_id:
+        #        raise UnableToCreateTabError(message=f"/openUrl endpoint wasn't able to create a new tab for URL={url_}")
+        #    logger.debug(f"openUrl/: opened tab {tab_id=}")
     result, code = load_url_in_tab(socketio, tab_id, url_)
     logger.debug(f"openUrl/: load_url_in_tab returns: {result=}, {code=}")
+
+    if code == 200:
+        return OpenUrlSuccess().to_response()
 

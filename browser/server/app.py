@@ -221,6 +221,7 @@ def get_tab_html(tab_id):
     request_id = str(uuid.uuid4())
     events_by_id[request_id] = event
 
+    logger.debug(f'/getTabHTML calling the browser: {tab_id=}, {request_id=}')
     socketio.emit('get_tab_html', {'tab_id': tab_id, 'request_id': request_id})
 
     try:
@@ -229,8 +230,10 @@ def get_tab_html(tab_id):
     except Timeout:
         del events_by_id[request_id]
         return timeout_response('getTabHTML'), 408
-
+    
     result = results_by_id.get(request_id)
+    logger.debug(f'/getTabHTML: {result=}')
+
     del events_by_id[request_id]
     del results_by_id[request_id]
     return {'status': 'success' if result else 'error', 'result': result}

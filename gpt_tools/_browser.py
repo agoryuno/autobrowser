@@ -13,6 +13,7 @@ from urllib3.util.retry import Retry
 
 from ._browser_protocol import BrowserProtocol
 from .exceptions import BrowserError, ServerError, PageNotFound
+from ._search import search as _search
 
 BASE_URL = "https://localhost"
 
@@ -136,17 +137,17 @@ class Browser(BrowserProtocol):
         result, code = self.request("POST", f"{self.base_url}/openUrl", json=data)
         return self._reply((result, code))
 
-    def search(self, query, max_results, timeout=None):
-        data = {'query': query,
-                'max_results': max_results}
-        print (f"browser.search: {data=}")
-        if timeout:
-            data["timeout"] = timeout
-        res = self.request("GET", 
-                     f"{self.base_url}/search",
-                     json=data)
-        print (f"browser.search: {res=}")
-        return self._reply(res)
+    def search(self, 
+               query, 
+               tab_id: Optional[int]=None,
+               max_results: int=20, 
+               timeout: Optional[int]=None):
+        
+        # ensure that query is a string
+        query = str(query)
+        _search(self, query, tab_id=tab_id, 
+                max_results=max_results,
+                timeout=timeout)
 
     def is_ready(self):
         result, _ = self.request("GET", f"{self.base_url}/health")

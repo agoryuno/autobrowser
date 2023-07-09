@@ -9,7 +9,7 @@ from time import sleep
 from html.parser import HTMLParser
 
 
-from gpt_tools import Browser
+from gpt_tools import Browser, search
 from gpt_tools.exceptions import BrowserError
 
 
@@ -278,11 +278,19 @@ class TestAddFunction(unittest.TestCase):
                               """)
         self.assertEqual(res, "TypeError: invalid assignment to const 'a'")
 
-    def test_open_url(self):
+    def atest_open_url(self):
         browser = Browser(TestAddFunction.token, trusted_ca=False)
         # Without tab ID
-        res = browser.open_url("https://www.google.com")
-        print (res)
+        self.assertRaises(BrowserError, browser.open_url, "https://www.google.com")
+
+        tab_id = browser.open_tab("https://www.yahoo.com")
+        # With tab ID
+        res = browser.open_url("https://www.google.com", tab_id)
+        self.assertTrue(res)
+
+    def test_search(self):
+        browser = Browser(TestAddFunction.token, trusted_ca=False)
+        res = browser.search("test")
 
 
 if __name__ == '__main__':

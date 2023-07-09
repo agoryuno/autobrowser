@@ -95,10 +95,10 @@ async function getTabHTML(tabId) {
           parseInt(tabId, 10), 
           { action: 'getHTML' }
     );
-    return html;
+    return {result: true, message: html};
   } catch (error) {
     console.error('Error getting HTML from content script:', error);
-    return false;
+    return {result: false, message: error.message};
   }
 }
 
