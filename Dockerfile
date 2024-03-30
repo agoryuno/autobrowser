@@ -21,7 +21,15 @@ COPY ./bin/start-vnc /app/bin/start-vnc
 COPY ./bin/install-certs /app/bin/install-certs
 COPY ./bin/cleanup /app/bin/cleanup
 COPY requirements.txt /
-COPY ./bin/certificate/ /app/certificate/
+
+# Check if the directory exists on the host
+RUN if [ -d ./bin/certificate/ ]; then \
+        # If it exists, copy its contents into the Docker image
+        cp -r ./bin/certificate/ /app/certificate/; \
+    else \
+        # If it doesn't exist, create the directory in the Docker image
+        mkdir -p /app/certificate/; \
+    fi
 
 # Install necessary dependencies
 RUN apt update && apt install -y \
